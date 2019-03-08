@@ -1,0 +1,543 @@
+" submode - Create your own submodes
+" Version: 0.3.1
+" Copyright (C) 2008-2014 kana <http://whileimautomaton.net/>
+" License: MIT license  {{{
+"     Permission is hereby granted, free of charge, to any person obtaining
+"     a copy of this software and associated documentation files (the
+"     "Software"), to deal in the Software without restriction, including
+"     without limitation the rights to use, copy, modify, merge, publish,
+"     distribute, sublicense, and/or sell copies of the Software, and to
+"     permit persons to whom the Software is furnished to do so, subject to
+"     the following conditions:
+"
+"     The above copyright notice and this permission notice shall be included
+"     in all copies or substantial portions of the Software.
+"
+"     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+"     OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+"     MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+"     IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+"     CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+"     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+"     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+" }}}
+" Concept
+"
+" In the following pseudo code, :MAP means :map or :noremap, and it depends on
+" user's specification.
+"
+" map {key-to-enter}
+" \   <Plug>(submode-before-entering:{submode}:with:{key-to-enter})
+"    \<Plug>(submode-before-entering:{submode})
+"    \<Plug>(submode-enter:{submode})
+"
+" MAP <Plug>(submode-before-entering:{submode}:with:{key-to-enter})
+" \   {anything}
+" noremap <Plug>(submode-before-entering:{submode})
+" \       {tweaking 'timeout' and others}
+" map <Plug>(submode-enter:{submode})
+" \   <Plug>(submode-before-action:{submode})
+"    \<Plug>(submode-prefix:{submode})
+"
+" map <Plug>(submode-prefix:{submode})
+" \   <Plug>(submode-leave:{submode})
+" map <Plug>(submode-prefix:{submode}){the first N keys in {lhs}}
+" \   <Plug>(submode-leave:{submode})
+" map <Plug>(submode-prefix:{submode}){lhs}
+" \   <Plug>(submode-rhs:{submode}:for:{lhs})
+"    \<Plug>(submode-enter:{submode})
+" MAP <Plug>(submode-rhs:{submode}:for:{lhs})
+" \   {rhs}
+
+
+
+
+
+
+
+
+" Variables
+let s:submode_always_show_submode = 0
+let s:submode_keep_leaving_key = 1          " Make unbound keys work as usual.
+let s:submode_keyseqs_to_leave = ['<Esc>']
+let s:submode_timeout = 0                   " Disable submode timeout.
+let s:submode_timeoutlen = &timeoutlen
+
+
+
+
+"" See s:set_up_options() and s:restore_options().
+"
+" let s:original_showcmd = &showcmd
+" let s:original_showmode = &showmode
+" let s:original_timeout = &timeout
+" let s:original_timeoutlen = &timeoutlen
+" let s:original_ttimeout = &ttimeout
+" let s:original_ttimeoutlen = &ttimeoutlen
+
+if !exists('s:options_overridden_p')
+  let s:options_overridden_p = 0
+endif
+
+" A padding string to wipe out internal key mappings in 'showcmd' area.  (gh-3)
+"
+" We use no-break spaces (U+00A0) or dots, depending of the current 'encoding'.
+" Because
+"
+" * A normal space (U+0020) is rendered as "<20>" since Vim 7.4.116.
+" * U+00A0 is rendered as an invisible glyph if 'encoding' is set to one of
+"   Unicode encodings.  Otherwise "| " is rendered instead.
+let s:STEALTH_TYPEAHEAD =
+\ &g:encoding =~# '^u'
+\ ? repeat("\<Char-0xa0>", 5)
+\ : repeat('.', 10)
+
+let s:current_submode = ''
+
+
+
+
+
+
+
+
+" Interface
+" :SubmodeRestoreOptions
+
+command! -bar -nargs=0 SubmodeRestoreOptions call
+  \ foldout#submode#restore_options()
+
+
+
+
+function! foldout#submode#current()
+  return s:current_submode
+endfunction
+
+
+
+
+function! foldout#submode#enter_with(submode, modes, options, lhs, ...)
+  let rhs = 0 < a:0 ? a:1 : '<Nop>'
+  for mode in s:each_char(a:modes)
+    call s:define_entering_mapping(a:submode, mode, a:options, a:lhs, rhs)
+  endfor
+  return
+endfunction
+
+
+
+
+function! foldout#submode#leave_with(submode, modes, options, lhs)
+  let options = substitute(a:modes, 'e', '', 'g')  " <Nop> is not expression.
+  return foldout#submode#map(a:submode, a:modes, options . 'x', a:lhs,
+    \ '<Nop>')
+endfunction
+
+
+
+
+function! foldout#submode#map(submode, modes, options, lhs, rhs)
+  for mode in s:each_char(a:modes)
+    call s:define_submode_mapping(a:submode, mode, a:options, a:lhs, a:rhs)
+  endfor
+  return
+endfunction
+
+
+
+
+function! foldout#submode#restore_options()
+  call s:restore_options()
+  return
+endfunction
+
+
+
+
+function! foldout#submode#unmap(submode, modes, options, lhs)
+  for mode in s:each_char(a:modes)
+    call s:undefine_submode_mapping(a:submode, mode, a:options, a:lhs)
+  endfor
+  return
+endfunction
+
+
+
+
+" Determine if given mapping exists.
+function! foldout#submode#mapped(submode, mode, lhs)
+  return maparg(s:named_key_prefix(a:submode) . a:lhs, a:mode) != ''
+endfunction
+
+
+
+
+
+
+
+
+" Core
+
+" Remove `named_key_before_entering_with` feature to allow `<Plug>` in lhs.
+" This removes the ability to associate a command with an entering mapping.
+function! s:define_entering_mapping(submode, mode, options, lhs, rhs)
+  execute s:map_command(a:mode, 'r')
+  \       s:map_options(s:filter_flags(a:options, 'u'))
+  \       (a:lhs)
+  \       (s:named_key_before_entering(a:submode)
+  \         . s:named_key_enter(a:submode))
+
+  if !s:mapping_exists_p(s:named_key_enter(a:submode), a:mode)
+    " When the given submode is not defined yet - define the default key
+    " mappings to leave the submode.
+    for keyseq in s:submode_keyseqs_to_leave
+      call foldout#submode#leave_with(a:submode, a:mode, a:options, keyseq)
+    endfor
+  endif
+
+  execute s:map_command(a:mode, '')
+  \       s:map_options('e')
+  \       s:named_key_before_entering(a:submode)
+  \       printf('<SID>on_entering_submode(%s)', string(a:submode))
+  execute s:map_command(a:mode, 'r')
+  \       s:map_options('')
+  \       s:named_key_enter(a:submode)
+  \       (s:named_key_before_action(a:submode)
+  \        . s:named_key_prefix(a:submode))
+
+  execute s:map_command(a:mode, '')
+  \       s:map_options('e')
+  \       s:named_key_before_action(a:submode)
+  \       printf('<SID>on_executing_action(%s)', string(a:submode))
+  execute s:map_command(a:mode, 'r')
+  \       s:map_options('')
+  \       s:named_key_prefix(a:submode)
+  \       s:named_key_leave(a:submode)
+  " NB: :map-<expr> cannot be used for s:on_leaving_submode(),
+  "     because it uses some commands not allowed in :map-<expr>.
+  execute s:map_command(a:mode, '')
+  \       s:map_options('s')
+  \       s:named_key_leave(a:submode)
+  \       printf('%s<SID>on_leaving_submode(%s)<Return>',
+  \              a:mode =~# '[ic]' ? '<C-r>=' : '@=',
+  \              string(a:submode))
+
+  return
+endfunction
+
+
+
+
+function! s:define_submode_mapping(submode, mode, options, lhs, rhs)
+
+  " Modify so that `named_key_leave` is called before the actual mapping.
+  execute s:map_command(a:mode, 'r')
+  \       s:map_options(s:filter_flags(a:options, 'bu'))
+  \       (s:named_key_prefix(a:submode) . a:lhs)
+  \       s:has_flag_p(a:options, 'x')
+  \         ? s:named_key_leave(a:submode) . s:named_key_rhs(a:submode, a:lhs)
+  \         : s:named_key_rhs(a:submode, a:lhs) . s:named_key_enter(a:submode)
+  execute s:map_command(a:mode, s:filter_flags(a:options, 'r'))
+  \       s:map_options(s:filter_flags(a:options, 'besu'))
+  \       s:named_key_rhs(a:submode, a:lhs)
+  \       a:rhs
+
+  let keys = s:split_keys(a:lhs)
+  for n in range(1, len(keys) - 1)
+    let first_n_keys = join(keys[:-(n+1)], '')
+    silent! execute s:map_command(a:mode, 'r')
+    \               s:map_options(s:filter_flags(a:options, 'bu'))
+    \               (s:named_key_prefix(a:submode) . first_n_keys)
+    \               s:named_key_leave(a:submode)
+  endfor
+
+  return
+endfunction
+
+
+
+
+function! s:undefine_submode_mapping(submode, mode, options, lhs)
+  execute s:map_command(a:mode, 'u')
+  \       s:map_options(s:filter_flags(a:options, 'b'))
+  \       s:named_key_rhs(a:submode, a:lhs)
+
+  let keys = s:split_keys(a:lhs)
+  for n in range(len(keys), 1, -1)
+    let first_n_keys = join(keys[:n-1], '')
+    execute s:map_command(a:mode, 'u')
+    \       s:map_options(s:filter_flags(a:options, 'b'))
+    \       s:named_key_prefix(a:submode) . first_n_keys
+    if s:longer_mapping_exists_p(s:named_key_prefix(a:submode), first_n_keys)
+      execute s:map_command(a:mode, 'r')
+      \       s:map_options(s:filter_flags(a:options, 'b'))
+      \       s:named_key_prefix(a:submode) . first_n_keys
+      \       s:named_key_leave(a:submode)
+      break
+    endif
+  endfor
+
+  return
+endfunction
+
+
+
+
+
+
+
+
+" Misc.
+function! s:each_char(s)
+  return split(a:s, '.\zs')
+endfunction
+
+
+
+
+function! s:filter_flags(s, cs)
+  return join(map(s:each_char(a:cs), 's:has_flag_p(a:s, v:val) ? v:val : ""'),
+  \           '')
+endfunction
+
+
+
+
+function! s:has_flag_p(s, c)
+  return 0 <= stridx(a:s, a:c)
+endfunction
+
+
+
+
+function! s:insert_mode_p(mode)
+  return a:mode =~# '^[iR]'
+endfunction
+
+
+
+
+function! s:longer_mapping_exists_p(submode, lhs)
+  " FIXME: Implement the proper calculation.
+  "        Note that mapcheck() can't be used for this purpose because it may
+  "        act as s:shorter_mapping_exists_p() if there is such a mapping.
+  return !0
+endfunction
+
+
+
+
+function! s:map_command(mode, flags)
+  if s:has_flag_p(a:flags, 'u')
+    return a:mode . 'unmap'
+  else
+    return a:mode . (s:has_flag_p(a:flags, 'r') ? 'map' : 'noremap')
+  endif
+endfunction
+
+
+
+
+function! s:map_options(options)
+  let _ = {
+  \   'b': '<buffer>',
+  \   'e': '<expr>',
+  \   's': '<silent>',
+  \   'u': '<unique>',
+  \ }
+  return join(map(s:each_char(a:options), 'get(_, v:val, "")'))
+endfunction
+
+
+
+
+function! s:mapping_exists_p(keyseq, mode)
+  return maparg(a:keyseq, a:mode) != ''
+endfunction
+
+
+
+
+function! s:may_override_showmode_p(mode)
+  " Normal mode / Visual mode (& its variants) / Insert mode (& its variants)
+  return a:mode =~# "^[nvV\<C-v>sS\<C-s>]" || s:insert_mode_p(a:mode)
+endfunction
+
+
+
+
+function! s:named_key_before_action(submode)
+  return printf('<Plug>(submode-before-action:%s)', a:submode)
+endfunction
+
+
+
+
+function! s:named_key_before_entering(submode)
+  return printf('<Plug>(submode-before-entering:%s)', a:submode)
+endfunction
+
+
+
+
+function! s:named_key_before_entering_with(submode, lhs)
+  return printf('<Plug>(submode-before-entering:%s:with:%s)', a:submode, a:lhs)
+endfunction
+
+
+
+
+function! s:named_key_enter(submode)
+  return printf('<Plug>(submode-enter:%s)', a:submode)
+endfunction
+
+
+
+
+function! s:named_key_leave(submode)
+  return printf('<Plug>(submode-leave:%s)', a:submode)
+endfunction
+
+
+
+
+function! s:named_key_prefix(submode)
+  return printf('<Plug>(submode-prefix:%s)%s', a:submode, s:STEALTH_TYPEAHEAD)
+endfunction
+
+
+
+
+function! s:named_key_rhs(submode, lhs)
+  return printf('<Plug>(submode-rhs:%s:for:%s)', a:submode, a:lhs)
+endfunction
+
+
+
+
+function! s:on_entering_submode(submode)
+  call s:set_up_options(a:submode)
+  return ''
+endfunction
+
+
+
+
+function! s:on_executing_action(submode)
+  if (s:original_showmode || s:submode_always_show_submode)
+  \  && s:may_override_showmode_p(mode())
+    echohl ModeMsg
+    echo '--' toupper(a:submode) '--'
+    echohl None
+  endif
+  return ''
+endfunction
+
+
+
+
+function! s:on_leaving_submode(submode)
+  if (s:original_showmode || s:submode_always_show_submode)
+  \  && s:may_override_showmode_p(mode())
+    if s:insert_mode_p(mode())
+      let cursor_position = getpos('.')
+    endif
+
+    " Clear the mode lighter.
+    echo ''
+
+    if s:insert_mode_p(mode())
+      call setpos('.', cursor_position)
+    endif
+  endif
+  if !s:submode_keep_leaving_key && getchar(1) isnot 0
+    " To completely ignore unbound key sequences in a submode,
+    " here we have to fetch and drop the last key in the key sequence.
+    call getchar()
+  endif
+  call s:restore_options()
+  return ''
+endfunction
+
+
+
+
+function! s:remove_flag(s, c)
+  " Assumption: a:c is not a meta character.
+  return substitute(a:s, a:c, '', 'g')
+endfunction
+
+
+
+
+function! s:restore_options()
+  if !s:options_overridden_p
+    return
+  endif
+  let s:options_overridden_p = 0
+
+  let &showcmd = s:original_showcmd
+  let &showmode = s:original_showmode
+  let &timeout = s:original_timeout
+  let &timeoutlen = s:original_timeoutlen
+  let &ttimeout = s:original_ttimeout
+  let &ttimeoutlen = s:original_ttimeoutlen
+
+  let s:current_submode = ''
+
+  return
+endfunction
+
+
+
+
+function! s:set_up_options(submode)
+  if s:options_overridden_p
+    return
+  endif
+  let s:options_overridden_p = !0
+
+  let s:original_showcmd = &showcmd
+  let s:original_showmode = &showmode
+  let s:original_timeout = &timeout
+  let s:original_timeoutlen = &timeoutlen
+  let s:original_ttimeout = &ttimeout
+  let s:original_ttimeoutlen = &ttimeoutlen
+
+  " NB: 'showcmd' must be enabled to render the cursor properly.
+  " If 'showcmd' is disabled and the current submode message is rendered, the
+  " cursor is rendered at the end of the message, not the actual position in
+  " the current window.  (gh-9)
+  set showcmd
+  set noshowmode
+  let &timeout = s:submode_timeout
+  let &ttimeout = s:original_timeout ? !0 : s:original_ttimeout
+  let &timeoutlen = s:submode_timeoutlen
+  let &ttimeoutlen = s:original_ttimeoutlen < 0
+  \                  ? s:original_timeoutlen
+  \                  : s:original_ttimeoutlen
+
+  let s:current_submode = a:submode
+
+  return
+endfunction
+
+
+
+
+function! s:split_keys(keyseq)
+  " Assumption: Special keys such as <C-u> are escaped with < and >, i.e.,
+  "             a:keyseq doesn't directly contain any escape sequences.
+  return split(a:keyseq, '\(<[^<>]\+>\|.\)\zs')
+endfunction
+
+
+
+
+
+
+
+
+" __END
+" vim: foldmethod=marker
