@@ -1,10 +1,10 @@
 # foldout.vim
 
 foldout provides an outline structure based on a hierarchy of headings. A
-heading is a string like "/* ## Title */", consisting of an optional prefix
-("/*") and suffix ("*/"), a string of heading symbols ("#"), and a title
-("Title"). The number of heading symbols determines the heading level. The
-default prefix and suffix are computed from 'commentstring', so in a code file,
+heading is a string like `/* ## Title */`, consisting of an optional prefix
+(`/*`) and suffix (`*/`), a string of heading symbols (`#`), and a title
+(`Title`). The number of heading symbols determines the heading level. The
+default prefix and suffix are computed from `commentstring`, so in a code file,
 you can create a heading by typing your language's comment prefix followed by
 heading symbols, without any per-language configuration.
 
