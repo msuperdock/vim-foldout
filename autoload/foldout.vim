@@ -81,18 +81,18 @@ function! foldout#enable()
     endfor
 
     " Compute a pattern matching the start of a file, or any heading pattern.
-    " The heading pattern covers the case where the file starts with a keyword.
-    let l:file_start = '\%^\|\ze\(' . s:pattern_any() . '\)'
+    " The heading pattern is a backup for when the file starts with a keyword.
+    let l:pattern_start = '\%^\|' . s:zero_width(s:pattern_any())
 
     " Match the whole file, which contains foldoutContent & foldoutChildren.
     execute 'autocmd Syntax * syntax region foldoutFile '
-      \ . 'start=' . s:quote(l:file_start) . ' end="\%$" '
+      \ . 'start=' . s:quote(l:pattern_start) . ' end="\%$" '
       \ . 'contains=foldoutContent,foldoutChildren'
 
     " Match the region from the beginning of a section, either after a heading
     " or at the beginning of the file, to the first subheading.
     execute 'autocmd Syntax * syntax region foldoutContent '
-      \ . 'start="\_." end=' . s:quote(s:pattern_any(1)) . ' '
+      \ . 'start="\_." end=' . s:quote(s:zero_width(s:pattern_any())) . ' '
       \ . 'contains=TOP contained keepend nextgroup=foldoutChildren'
 
     " Match the region from the first child heading through the end of the last
@@ -125,7 +125,7 @@ function! foldout#enable()
         \ . 'contains=foldoutHeading '
         \ . 'contained keepend skipnl'
       execute 'autocmd Syntax * syntax region foldoutBody' . l:i . ' '
-        \ . 'start="\_." end=' . s:quote(s:pattern_max(l:i, 1)) . ' '
+        \ . 'start="\_." end=' . s:quote(s:zero_width(s:pattern_max(l:i))) . ' '
         \ . 'contains=foldoutContent'
         \ . (l:i < b:foldout_max_level ? ',foldoutChildren ' : ' ')
         \ . (l:i >= b:foldout_min_fold ? 'fold ' : '')
@@ -724,6 +724,11 @@ function! s:quote(pattern)
   endfor
 endfunction
 
+" Convert a pattern into a zero-width pattern.
+function! s:zero_width(pattern)
+  return '\ze\(' . a:pattern . '\)'
+endfunction
+
 " ## Heading text
 
 " Compute the heading prefix & suffix from the heading string, return as list.
@@ -769,47 +774,32 @@ endfunction
 " The prefix pattern matches everything up to the heading symbols.
 " The suffix pattern matches everything after the heading symbols.
 " Include a space after prefix if nonempty, and before suffix if nonempty.
-" With an optional argument of 1, include a `\ze` after the caret.
-" With an optional argument of 2, include a `\ze` after the heading symbols.
-" Otherwise, do not include a `\ze`.
+" With optional flag, include a `\ze` after the caret.
 function! s:pattern_split(...)
   let [l:prefix, l:suffix] = s:heading_split()
-  let l:end = get(a:, 1, 0)
-
-  let l:prefix_pattern = '^'
-    \ . (l:end == 1 ? '\ze' : '')
-    \ . s:escape(l:prefix)
-
-  let l:suffix_pattern = ''
-    \ . (l:end == 2 ? '\ze' : '')
-    \ . ' .*' . s:escape(l:suffix) . '.*$'
-
-  return [l:prefix_pattern, l:suffix_pattern]
+  return
+    \ [ '^' . s:escape(l:prefix)
+    \ , (get(a:, 1, 0) ? '\ze' : '') . ' .*' . s:escape(l:suffix) . '.*$'
+    \ ]
 endfunction
 
 " Compute a pattern representing a heading of exactly the given level.
 " The pattern expects a space character after the prefix if prefix nonempty.
 " The pattern expects a space character before the suffix if suffix nonempty.
-" With an optional argument of 1, include a `\ze` after the caret.
-" With an optional argument of 2, include a `\ze` after the heading symbols.
-" Otherwise, do not include a `\ze`.
+" With optional flag, include a `\ze` after the caret.
 function! s:pattern_exact(level, ...)
   let [l:prefix, l:suffix] = s:pattern_split(get(a:, 1, 0))
   return l:prefix . repeat(b:foldout_heading_symbol, a:level) . l:suffix
 endfunction
 
 " A pattern representing a top-level heading.
-" With an optional argument of 1, include a `\ze` after the caret.
-" With an optional argument of 2, include a `\ze` after the heading symbols.
-" Otherwise, do not include a `\ze`.
+" With optional flag, include a `\ze` after the caret.
 function! s:pattern_top(...)
   return s:pattern_exact(1, get(a:, 1, 0))
 endfunction
 
 " Compute a pattern representing a heading of at most the given level.
-" With an optional argument of 1, include a `\ze` after the caret.
-" With an optional argument of 2, include a `\ze` after the heading symbols.
-" Otherwise, do not include a `\ze`.
+" With optional flag, include a `\ze` after the caret.
 function! s:pattern_max(level, ...)
   if a:level == 1
     return s:pattern_top(get(a:, 1, 0))
@@ -823,9 +813,7 @@ function! s:pattern_max(level, ...)
 endfunction
 
 " A pattern representing a heading of any level.
-" With an optional argument of 1, include a `\ze` after the caret.
-" With an optional argument of 2, include a `\ze` after the heading symbols.
-" Otherwise, do not include a `\ze`.
+" With optional flag, include a `\ze` after the caret.
 function! s:pattern_any(...)
   return s:pattern_max(b:foldout_max_level, get(a:, 1, 0))
 endfunction
@@ -844,4 +832,3 @@ function! s:pattern_end()
   let l:pattern = l:suffix == '' ? '$' : ' \zs' . s:escape(l:suffix[1:])
   return l:pattern
 endfunction
-
