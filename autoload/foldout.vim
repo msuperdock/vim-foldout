@@ -778,7 +778,7 @@ endfunction
 function! s:pattern_split(...)
   let [l:prefix, l:suffix] = s:heading_split()
   return
-    \ [ '^' . s:escape(l:prefix)
+    \ [ '^\s*' . s:escape(l:prefix)
     \ , (get(a:, 1, 0) ? '\ze' : '') . ' .*' . s:escape(l:suffix) . '.*$'
     \ ]
 endfunction
