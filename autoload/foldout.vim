@@ -80,18 +80,26 @@ function! foldout#enable()
       let l:heading_list .= ',foldoutHeadingLine' . l:i
     endfor
 
+    " Compute a pattern matching the start of a file, or any heading pattern.
+    " The heading pattern covers the case where the file starts with a keyword.
+    let l:file_start = '\%^\|\ze\(' . s:pattern_any() . '\)'
+
+    " Match the whole file, which contains foldoutContent & foldoutChildren.
+    execute 'autocmd Syntax * syntax region foldoutFile '
+      \ . 'start=' . s:quote(l:file_start) . ' end="\%$" '
+      \ . 'contains=foldoutContent,foldoutChildren'
+
     " Match the region from the beginning of a section, either after a heading
     " or at the beginning of the file, to the first subheading.
     execute 'autocmd Syntax * syntax region foldoutContent '
       \ . 'start="\_." end=' . s:quote(s:pattern_any(1)) . ' '
-      \ . 'nextgroup=foldoutChildren '
-      \ . 'contains=TOP,foldoutContent keepend'
+      \ . 'contains=TOP contained keepend nextgroup=foldoutChildren'
 
     " Match the region from the first child heading through the end of the last
     " child section, including from the first top-level heading to end of file.
     execute 'autocmd Syntax * syntax region foldoutChildren '
       \ . 'start=' . s:quote(s:pattern_any()) . ' end="\%$" '
-      \ . 'contains=' . l:heading_list
+      \ . 'contains=' . l:heading_list . ' contained'
 
     " Match heading, which may be just the initial part of the heading line.
     execute 'autocmd Syntax * syntax region foldoutHeading '
