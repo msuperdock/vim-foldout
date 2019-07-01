@@ -129,6 +129,16 @@ inoremap <tab> <c-\><c-o>:silent call foldout#tab()<cr>
 inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>
 ```
 
+## Limitations
+
+If a file begins with a keyword (e.g. `module`), as defined by the syntax file
+for the file's filetype, then foldout fails to recognize any headings in the
+file. This is an inherent limitation; keywords have a higher precedence than
+regions, and foldout relies on matching the entire file as a region.
+
+If you encounter this issue, start your file with something other than a
+keyword, like a comment, a foldout heading, or an empty line.
+
 ## Credits
 
 foldout relies critically on two plugins:
