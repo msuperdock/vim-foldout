@@ -120,6 +120,7 @@ navigation mode:
 | `foldout#call(expr)` | Convenience function for creating mappings. |
 | `foldout#tab()` | Demote if at heading, else simulate tab. |
 | `foldout#shift_tab()` | Promote if at heading, else simulate shift-tab. |
+| `foldout#syntax()` | View the stack of syntax matches at the cursor. |
 
 The `foldout#tab()` and `foldout#shift_tab()` functions are designed to be
 bound to tab and shift-tab in insert mode; for example:
@@ -129,15 +130,67 @@ inoremap <tab> <c-\><c-o>:silent call foldout#tab()<cr>
 inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>
 ```
 
-## Limitations
+## Known issues
 
-If a file begins with a keyword (e.g. `module`), as defined by the syntax file
-for the file's filetype, then foldout fails to recognize any headings in the
-file. This is an inherent limitation; keywords have a higher precedence than
-regions, and foldout relies on matching the entire file as a region.
+If you see unexpected highlighting, use `:call foldout#syntax()` to see the
+stack of syntax groups at the cursor. If foldout is enabled, you should expect
+to see `foldoutFile`, followed by one or more foldout-related groups, followed
+by zero or more non-foldout-related groups, for example:
 
-If you encounter this issue, start your file with a non-keyword, like a comment,
-a foldout heading, or an empty line.
+```
+foldoutFile, foldoutChildren, foldoutBody1, foldoutContent, javaScriptIdentifier -> Identifier
+```
+
+If you do not see this general pattern of groups, then you are experiencing a
+foldout-related issue. The two known issues are below:
+
+### Files beginning with keywords
+
+If a file begins with a keyword, then no foldout headings are detected. For
+example, consider the following JavaScript file:
+
+```
+var x = 2
+
+// # print
+
+console.log(x)
+```
+
+The `print` heading is not detected. The issue is that foldout relies on
+matching the entire file as a region, but `var` is declared as a keyword in
+vim's JavaScript syntax file, and keywords have higher precedence than regions.
+There are two possible fixes:
+
+- Add an empty line above `var x = 2` to avoid starting the file with a keyword.
+- Modify the JavaScript syntax file so that `var` uses `match`, not `keyword`:
+  - Download [the default JavaScript syntax
+    file](https://github.com/vim/vim/blob/master/runtime/syntax/javascript.vim)
+    to `~/.vim/syntax/javascript.vim` (if using vim) or
+    `~/.config/nvim/syntax/javascript.vim` (if using neovim).
+  - Find the line declaring `var` (along with other identifiers) as a keyword:
+    ```
+    syn keyword javaScriptIdentifier arguments this var let
+    ```
+  - Remove `var` and add a line recognizing `var` using `match`:
+    ```
+    syn keyword javaScriptIdentifier arguments this let
+    syn match javaScriptIdentifier "\<var\>"
+    ```
+
+### Syntax files using `contains=ALL` or `contains=CONTAINED`
+
+A syntax file may use `contains=ALL` to indicate that within a match or region,
+all match groups are in scope, which may cause unexpected highlighting when used
+with foldout. The issue is that foldout relies on carefully controlling where
+its own syntax groups may match, which is impossible in the presence of the
+`contains=ALL` construct. (Similar remarks apply to `contains=CONTAINED`.)
+
+The higher-quality syntax files tend to avoid these constructs in favor of
+explicit lists of contained clusters and syntax groups. If you encounter this
+issue, consider using a vim plugin that provides an alternative syntax file for
+the affected filetype, or modify the syntax file yourself to replace `ALL` or
+`CONTAINED` with explicit lists of contained clusters and syntax groups.
 
 ## Credits
 

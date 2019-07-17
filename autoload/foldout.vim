@@ -684,6 +684,20 @@ function! foldout#fold_text()
   return ''
 endfunction
 
+" # Query
+
+" Function for seeing the current syntax attributes. Modified from
+" https://stackoverflow.com/questions/9464844/how-to-get-group-name-of-highlighting-under-cursor-in-vim.
+function! foldout#syntax()
+  if exists("*synstack")
+    let l:g = synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
+    let l:s = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+    echo (l:g ==# '' ? '(none)' : join(l:s, ', ') . ' -> ' . l:g)
+  else
+    echo '(none)'
+  endif
+endfunction
+
 " # Utilities
 
 " ## Wrapping strings
