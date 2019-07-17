@@ -160,10 +160,9 @@ matching the entire file as a region, but `var` is declared as a keyword in
 vim's JavaScript syntax file, and keywords have higher precedence than regions.
 An easy fix is to add an empty line to the top of the file.
 
-For a more permanent fix, consider modifying the syntax file to replace any
-`keyword` that may occur at the beginning of the file with a `match`. For
-example, to do this with the JavaScript keyword `var`, start by downloading the
-default JavaScript syntax file
+For a more permanent fix, modify the syntax file to replace any `keyword` that
+may occur at the beginning of the file with a `match`. For example, for the
+JavaScript keyword `var`, download the default JavaScript syntax file
 ([link](https://github.com/vim/vim/blob/master/runtime/syntax/javascript.vim))
 to `~/.vim/syntax/javascript.vim` (if using vim) or
 `~/.config/nvim/syntax/javascript.vim` (if using neovim). vim will now use the
