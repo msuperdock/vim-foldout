@@ -154,7 +154,7 @@ bound to tab and shift-tab in insert mode; for example:
 `inoremap <tab> <c-\><c-o>:silent call foldout#tab()<cr>`
 `inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>`
 
-LIMITATIONS                                     *foldout-limitations*
+KNOWN ISSUES                                    *foldout-known-issues*
 
 If you see unexpected highlighting, use `:call foldout#syntax()` to see the
 stack of syntax groups at the cursor. If |foldout| is enabled, you should expect
@@ -168,31 +168,36 @@ If you do not see this general pattern of groups, then you are experiencing a
 
 (1) Files beginning with keywords.
 
-If a file begins with a keyword, then no foldout headings are detected. For
+If a file begins with a keyword, then no |foldout| headings are detected. For
 example, consider the following JavaScript file:
 
 `var x = 2`
-
 `// # print`
-
 `console.log(x)`
 
 The `print` heading is not detected. The issue is that |foldout| relies on
 matching the entire file as a region, but `var` is declared as a keyword in
 vim's JavaScript syntax file, and keywords have higher precedence than regions.
-There are two possible fixes:
+An easy fix is to add an empty line to the top of the file.
 
-- Add an empty line above `var x = 2` to avoid starting the file with a keyword.
-- Modify the JavaScript syntax file so that `var` uses `match`, not `keyword`:
-  - Download the default JavaScript syntax file
-    (https://github.com/vim/vim/blob/master/runtime/syntax/javascript.vim) to
-    `~/.vim/syntax/javascript.vim` (if using vim) or
-    `~/.config/nvim/syntax/javascript.vim` (if using neovim).
-  - Find the line declaring `var` (along with other identifiers) as a keyword:
-    `syn keyword javaScriptIdentifier arguments this var let`
-  - Remove `var` and add a line recognizing `var` using `match`:
-    `syn keyword javaScriptIdentifier arguments this let`
-    `syn match javaScriptIdentifier "\<var\>"`
+For a more permanent fix, consider modifying the syntax file to replace any
+`keyword` that may occur at the beginning of the file with a `match`. For
+example, to do this with the JavaScript keyword `var`, start by downloading
+the default JavaScript syntax file
+(https://github.com/vim/vim/blob/master/runtime/syntax/javascript.vim) to
+`~/.vim/syntax/javascript.vim` (if using vim) or
+`~/.config/nvim/syntax/javascript.vim` (if using neovim). vim will now use the
+downloaded syntax file instead of the default syntax file. Find the line
+declaring `var` as a keyword:
+
+`syn keyword javaScriptIdentifier arguments this var let`
+
+Then remove `var` and add a line recognizing `var` using `match`:
+
+`syn keyword javaScriptIdentifier arguments this let`
+`syn match javaScriptIdentifier "\<var\>"`
+
+The heading is now detected, and the JavaScript highlighting is unchanged.
 
 (2) Syntax files using `contains=ALL` or `contains=CONTAINED`.
 
