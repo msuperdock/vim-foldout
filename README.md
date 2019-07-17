@@ -142,7 +142,7 @@ foldoutFile, foldoutChildren, foldoutBody1, foldoutContent, javaScriptIdentifier
 ```
 
 If you do not see this general pattern of groups, then you are experiencing a
-foldout-related issue. The two known issues are below:
+foldout-related issue. The two known issues are:
 
 ### Files beginning with keywords
 
