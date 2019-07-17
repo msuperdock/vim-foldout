@@ -120,7 +120,7 @@ navigation mode:
 | `foldout#call(expr)` | Convenience function for creating mappings. |
 | `foldout#tab()` | Demote if at heading, else simulate tab. |
 | `foldout#shift_tab()` | Promote if at heading, else simulate shift-tab. |
-| `foldout#syntax()` | View the stack of syntax matches at the cursor. |
+| `foldout#syntax()` | View the stack of syntax groups at the cursor. |
 
 The `foldout#tab()` and `foldout#shift_tab()` functions are designed to be
 bound to tab and shift-tab in insert mode; for example:

@@ -686,7 +686,7 @@ endfunction
 
 " # Query
 
-" View the stack of syntax matches at the cursor. Modified from
+" View the stack of syntax groups at the cursor. Modified from
 " https://stackoverflow.com/questions/9464844/how-to-get-group-name-of-highlighting-under-cursor-in-vim.
 function! foldout#syntax()
   if exists("*synstack")
