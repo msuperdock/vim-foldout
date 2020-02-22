@@ -1,4 +1,4 @@
-" # Enable & disable
+" ## Enable & disable
 
 " Enable foldout in the current buffer. If called while foldout is already
 " enabled, apply current values of the buffer option variables.
@@ -190,7 +190,7 @@ function! foldout#toggle()
   endif
 endfunction
 
-" # Headings
+" ## Headings
 
 " Determine the current heading level at the given line, or at the cursor if no
 " argument is given. Return 0 if not at a heading.
@@ -249,7 +249,7 @@ function! foldout#promote()
   call cursor(line('.'), l:col - 1)
 endfunction
 
-" # Navigation
+" ## Navigation
 
 " Go to previous sibling heading, if at a heading and if there is one.
 function! foldout#up()
@@ -507,7 +507,7 @@ function! foldout#goto(heading, level, ...)
   endif
 endfunction
 
-" # Folding
+" ## Folding
 
 " Toggle current fold, moving down one line if at a header.
 function! foldout#toggle_fold()
@@ -543,7 +543,7 @@ function! foldout#center()
   normal! zz
 endfunction
 
-" # Insertion
+" ## Insertion
 
 " Append a new line to the end of the current section, enter insert mode.
 function! foldout#append()
@@ -631,7 +631,7 @@ function! foldout#open(...)
   call cursor(l:line + (l:before ? 2 : 1), s:heading_pos(l:new_level))
 endfunction
 
-" # Mapping
+" ## Mapping
 
 " Wrap the given expression with `:call` and `<cr>`, for mapping code.
 function! foldout#call(expr)
@@ -670,7 +670,7 @@ function! foldout#shift_tab()
   endif
 endfunction
 
-" # Option values
+" ## Option values
 
 " Store default foldout values of fillchars & foldtext.
 let s:fillchars = 'fold: '
@@ -684,7 +684,7 @@ function! foldout#fold_text()
   return ''
 endfunction
 
-" # Query
+" ## Query
 
 " View the stack of syntax groups at the cursor. Modified from
 " https://stackoverflow.com/questions/9464844/how-to-get-group-name-of-highlighting-under-cursor-in-vim.
@@ -698,9 +698,9 @@ function! foldout#syntax()
   endif
 endfunction
 
-" # Utilities
+" ## Utilities
 
-" ## Wrapping strings
+" ### Wrapping strings
 
 " Create a pattern that matches exactly the given string, by escaping chars.
 function! s:escape(str)
@@ -738,7 +738,7 @@ function! s:zero_width(pattern)
   return '\ze\(' . a:pattern . '\)'
 endfunction
 
-" ## Heading text
+" ### Heading text
 
 " Compute the heading prefix & suffix from the heading string, return as list.
 " Include a space after prefix if nonempty, and before suffix if nonempty.
@@ -777,7 +777,7 @@ function! s:prefix_length()
   return len(s:heading_split()[0])
 endfunction
 
-" ## Heading patterns
+" ### Heading patterns
 
 " Compute the heading prefix & suffix patterns, return as list.
 " The prefix pattern matches everything up to the heading symbols.

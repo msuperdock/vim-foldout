@@ -1,15 +1,15 @@
-" foldout.vim - Outline-based folding for any filetype.
+" vim-foldout - Outline-based folding for any filetype.
 " Maintainer:   Matt Superdock
 " Version:      1.0
 " License:      MIT
 
-if exists("g:loaded_foldout")
+if exists('g:foldout_loaded')
   finish
 else
-  let g:loaded_foldout = 1
+  let g:foldout_loaded = 1
 endif
 
-" # Global options
+" ## Global options
 
 " Indicates whether to allow foldout to set default navigation mode bindings.
 " If 0, navigation mode uses only the bindings set manually with `foldout#map`.
@@ -38,7 +38,7 @@ if !exists('g:foldout_save')
   let g:foldout_save = 0
 endif
 
-" # Buffer options
+" ## Buffer options
 
 " Each of these options has a global variable and a buffer-local variable
 " (prefixed by `b` instead of `g`). The buffer-local variable takes precedence;
@@ -73,7 +73,7 @@ if !exists('g:foldout_append_text')
   let g:foldout_append_text = ''
 endif
 
-" # Enable
+" ## Enable
 
 " Enable foldout in files according to `g:foldout_files` setting.
 if g:foldout_files != ''
@@ -90,7 +90,7 @@ if g:foldout_files != '' && g:foldout_save
   execute 'autocmd BufWinLeave ' . g:foldout_files . ' mkview'
 endif
 
-" # Bindings
+" ## Bindings
 
 " List from `https://hea-www.harvard.edu/~fine/Tech/vi.html`; removed `:`.
 let s:keys =

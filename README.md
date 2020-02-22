@@ -1,4 +1,4 @@
-# foldout.vim
+# vim-foldout
 
 foldout provides an outline structure based on a hierarchy of headings. A
 heading is a string like `/* ## Title */`, consisting of an optional prefix
