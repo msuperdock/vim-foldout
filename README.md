@@ -21,6 +21,15 @@ Use your preferred installation method; for example, with
 Plug 'msuperdock/vim-foldout'
 ```
 
+By default, foldout is automatically enabled in all buffers whose filenames
+contain a dot (see option `g:foldout_files` to customize this), and can be
+manually enabled using `:call foldout#enable()`. Consider binding keys to some
+of the functions documented below; for example:
+
+```
+noremap <silent> <tab> :call foldout#toggle_fold()<cr>
+```
+
 If your `.vimrc` uses `mkview` or `loadview` to save and restore view data,
 remove these commands and set `g:foldout_save`. (The `mkview` and `loadview`
 commands need to be called in certain sequence with foldout commands, and
@@ -29,10 +38,6 @@ foldout handles this for you.) For example:
 ```
 let g:foldout_save = 1
 ```
-
-foldout is automatically enabled by default in all buffers whose filenames
-contain an extension. You can change this using the `g:foldout_files` variable;
-see below.
 
 ## Options
 
@@ -61,7 +66,7 @@ Use the vim help files (e.g. `:h foldout_options`) for documentation.
 
 ## Functions
 
-foldout provides the following functions, which you may want to bind to keys:
+foldout provides the following functions:
 
 ### Enable
 
@@ -107,7 +112,7 @@ inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>
 
 | function | description |
 | --- | --- |
-| `foldout#toggle_fold` | Toggle fold at cursor. |
+| `foldout#toggle_fold()` | Toggle fold at cursor. |
 | `foldout#show()` | Open all folds. |
 | `foldout#focus()` | Close all folds but those needed to see cursor. |
 | `foldout#center()` | Redraw so that cursor is vertically centered. |
