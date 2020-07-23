@@ -488,17 +488,17 @@ endfunction
 " Search for the given heading at the given level; go to heading if found.
 " The optional argument indicates whether to enter the section.
 " Return 1 if heading is not found, 0 otherwise.
-function! foldout#goto(heading, level, ...)
+function! foldout#goto(name, level, ...)
   let [l:prefix, l:suffix] = s:heading_split()
   let l:pattern = '^'
     \ . s:escape(l:prefix)
     \ . repeat(b:foldout_heading_symbol, a:level)
-    \ . '\s\+' . a:heading . '\s*'
+    \ . '\s\+' . a:name . '\s*'
     \ . s:escape(l:suffix)
     \ . '.*$'
 
   if search(l:pattern, 'c') == 0
-    echo a:heading . ' section not found.'
+    echo a:name . ' section not found.'
     return 1
   elseif a:0 >= 1 && a:1
     call foldout#child()

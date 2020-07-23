@@ -87,7 +87,7 @@ inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>
 | `foldout#top()` | Go to first sibling heading. |
 | `foldout#bottom()` | Go to last sibling heading. |
 | `foldout#child()` | Go to first child heading. |
-| `foldout#goto(heading, level)` | Go to heading with given name & level. |
+| `foldout#goto(name, level)` | Go to heading with given name & level. |
 
 ### Folding
 

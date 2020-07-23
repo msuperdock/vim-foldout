@@ -322,9 +322,9 @@ foldout#bottom()                                *foldout#bottom()*
 foldout#child()                                 *foldout#child()*
         Go to first nonempty line inside a heading, if there is one.
 
-foldout#goto({heading}, {level} [, {enter}])    *foldout#goto()*
-        Search for string {heading} at level number {level}; go to heading if
-        found. If {enter} is given, enter the section. Return 1 if heading is
+foldout#goto({name}, {level} [, {enter}])       *foldout#goto()*
+        Search for heading string {name} at level number {level}; go to heading
+        if found. If {enter} is given, enter the section. Return 1 if heading is
         not found, 0 otherwise.
 
 foldout#toggle_fold()                           *foldout#toggle_fold()*
