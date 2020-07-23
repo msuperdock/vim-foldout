@@ -23,13 +23,6 @@ Use your preferred installation method; for example, with vim-plug, use:
 
 `Plug 'msuperdock/vim-foldout'`
 
-By default, |foldout| is automatically enabled in all buffers whose filenames
-contain a dot (see |g:foldout_files|), and can be manually enabled using
-|foldout#enable()|. Consider binding keys to some of the functions documented
-below; for example:
-
-`noremap <silent> <tab> :call foldout#toggle_fold()<cr>`
-
 If your .vimrc uses |:mkview| or |:loadview| to save and restore view data,
 remove these commands and set |g:foldout_save|. (The |:mkview| and |:loadview|
 commands need to be called in certain sequence with |foldout| commands, and
@@ -37,45 +30,17 @@ commands need to be called in certain sequence with |foldout| commands, and
 
 `let g:foldout_save = 1`
 
-OPTIONS                                         *foldout-options*
-
-|foldout| provides the following option variables for configuration. The
-prefix column indicates whether the option is a global option, a buffer-local
-option, or both. Buffer-local options override global options where both are
-present. You can set an option in your .vimrc using, for example:
-
-`let g:foldout_heading_symbol = '*'`
-
-| prefix | variable                | default | description                     |
-| ------ | ----------------------- | ------- | ------------------------------- |
-| g      | |foldout_files|           | "*.*"   | Pattern determining whether to  |
-|        |                         |         |   enable |foldout|.               |
-| g      | |foldout_save|            | 0       | Allow foldout to save & restore |
-|        |                         |         |   view data.                    |
-| b, g   | |foldout_heading_symbol|  | "#"     | Repeated symbol indicating      |
-|        |                         |         |   heading level.                |
-| b, g   | |foldout_max_level|       | 6       | Maximum allowed heading level.  |
-|        |                         |         |                                 |
-| b, g   | |foldout_min_fold|        | 1       | Minimum level at which to       |
-|        |                         |         |   enable folding.               |
-| b      | |foldout_heading_comment| | 1       | Highlight heading delimiters as |
-|        |                         | (0)*    |   comments.                     |
-| b      | |foldout_heading_string|  | **      | Heading pattern, in             |
-|        |                         | ("%s")* |   'commentstring' format.       |
-
-* This is an alternative default, for Markdown files only.
-** The default for |foldout_heading_string| is the value of 'commentstring'.
-
-Options governing the |foldout#append()| function:
-
-| b, g   | |foldout_append_pattern|  | "\@!"   | Pattern determining whether to  |
-|        |                         |         |   insert empty line.            |
-| b, g   | |foldout_append_text|     | ""      | Prefix text to insert.          |
-|        |                         |         |                                 |
+By default, |foldout| is automatically enabled in all buffers whose filenames
+contain a dot (see |g:foldout_files| to customize this), and can be manually
+enabled & disabled using |foldout#enable()|, |foldout#disable()|, and
+|foldout#toggle()|.
 
 FUNCTIONS                                       *foldout-functions*
 
-|foldout| provides the following functions, which you may want to bind to keys:
+|foldout| provides the following functions. You can bind a key to a function in
+your .vimrc using, for example:
+
+`noremap <silent> <tab> :call foldout#toggle_fold()<cr>`
 
 Enable:
 
@@ -130,6 +95,42 @@ Insertion:
 Query:
 
 | |foldout#syntax()|         | View the stack of syntax groups at the cursor.    |
+
+OPTIONS                                         *foldout-options*
+
+|foldout| provides the following option variables for configuration. The
+prefix column indicates whether the option is a global option, a buffer-local
+option, or both. Buffer-local options override global options where both are
+present. You can set an option in your .vimrc using, for example:
+
+`let g:foldout_heading_symbol = '*'`
+
+| prefix | variable                | default | description                     |
+| ------ | ----------------------- | ------- | ------------------------------- |
+| g      | |foldout_files|           | "*.*"   | Pattern determining whether to  |
+|        |                         |         |   enable |foldout|.               |
+| g      | |foldout_save|            | 0       | Allow foldout to save & restore |
+|        |                         |         |   view data.                    |
+| b, g   | |foldout_heading_symbol|  | "#"     | Repeated symbol indicating      |
+|        |                         |         |   heading level.                |
+| b, g   | |foldout_max_level|       | 6       | Maximum allowed heading level.  |
+|        |                         |         |                                 |
+| b, g   | |foldout_min_fold|        | 1       | Minimum level at which to       |
+|        |                         |         |   enable folding.               |
+| b      | |foldout_heading_comment| | 1       | Highlight heading delimiters as |
+|        |                         | (0)*    |   comments.                     |
+| b      | |foldout_heading_string|  | **      | Heading pattern, in             |
+|        |                         | ("%s")* |   'commentstring' format.       |
+
+* This is an alternative default, for Markdown files only.
+** The default for |foldout_heading_string| is the value of 'commentstring'.
+
+Options governing the |foldout#append()| function:
+
+| b, g   | |foldout_append_pattern|  | "\@!"   | Pattern determining whether to  |
+|        |                         |         |   insert empty line.            |
+| b, g   | |foldout_append_text|     | ""      | Prefix text to insert.          |
+|        |                         |         |                                 |
 
 KNOWN ISSUES                                    *foldout-known-issues*
 

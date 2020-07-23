@@ -21,15 +21,6 @@ Use your preferred installation method; for example, with
 Plug 'msuperdock/vim-foldout'
 ```
 
-By default, foldout is automatically enabled in all buffers whose filenames
-contain a dot (see option `g:foldout_files` to customize this), and can be
-manually enabled using `:call foldout#enable()`. Consider binding keys to some
-of the functions documented below; for example:
-
-```
-noremap <silent> <tab> :call foldout#toggle_fold()<cr>
-```
-
 If your `.vimrc` uses `mkview` or `loadview` to save and restore view data,
 remove these commands and set `g:foldout_save`. (The `mkview` and `loadview`
 commands need to be called in certain sequence with foldout commands, and
@@ -39,34 +30,19 @@ foldout handles this for you.) For example:
 let g:foldout_save = 1
 ```
 
-## Options
-
-foldout provides the following option variables for configuration. The prefix
-column indicates whether the option is a global option, a buffer-local option,
-or both. Buffer-local options override global options where both are present.
-You can set an option in your `.vimrc` using, for example:
-
-```
-let g:foldout_heading_symbol = '*'
-```
-
-| prefix | variable | default | description |
-| --- | --- | --- | --- |
-| `g` | `foldout_files` | `'*.*'` | Pattern determining whether to enable foldout. |
-| `g` | `foldout_save` | 0 | Allow foldout to save & restore view data. |
-| `b, g` | `foldout_heading_symbol` | `'#'` | Repeated symbol indicating heading level. |
-| `b, g` | `foldout_max_level` | 6 | Maximum allowed heading level. |
-| `b, g` | `foldout_min_fold` | 1 | Minimum level at which to enable folding. |
-| `b, g` | `foldout_append_pattern` | `'\@!'` | Pattern determining whether to insert empty line in `foldout#append()`. |
-| `b, g` | `foldout_append_text` | `''` | Prefix text to insert in `foldout#append()`. |
-| `b` | `foldout_heading_comment` | 1 (0 for markdown) | Highlight heading delimiters as comments. |
-| `b` | `foldout_heading_string` | `commentstring` (`'%s'` for markdown) | Heading pattern, in `commentstring` format. |
-
-Use the vim help files (e.g. `:h foldout_options`) for documentation.
+By default, foldout is automatically enabled in all buffers whose filenames
+contain a dot (see option `g:foldout_files` to customize this), and can be
+manually enabled & disabled using `:call foldout#enable()`,
+`:call foldout#disable()`, and `call foldout#toggle()`.
 
 ## Functions
 
-foldout provides the following functions:
+foldout provides the following functions. You can bind a key to a function in
+your `.vimrc` using, for example:
+
+```
+noremap <silent> <tab> :call foldout#toggle_fold()<cr>
+```
 
 ### Enable
 
@@ -129,6 +105,31 @@ inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>
 | function | description |
 | --- | --- |
 | `foldout#syntax()` | View the stack of syntax groups at the cursor. |
+
+## Options
+
+foldout provides the following option variables for configuration. The prefix
+column indicates whether the option is a global option, a buffer-local option,
+or both. Buffer-local options override global options where both are present.
+You can set an option in your `.vimrc` using, for example:
+
+```
+let g:foldout_heading_symbol = '*'
+```
+
+| prefix | variable | default | description |
+| --- | --- | --- | --- |
+| `g` | `foldout_files` | `'*.*'` | Pattern determining whether to enable foldout. |
+| `g` | `foldout_save` | 0 | Allow foldout to save & restore view data. |
+| `b, g` | `foldout_heading_symbol` | `'#'` | Repeated symbol indicating heading level. |
+| `b, g` | `foldout_max_level` | 6 | Maximum allowed heading level. |
+| `b, g` | `foldout_min_fold` | 1 | Minimum level at which to enable folding. |
+| `b, g` | `foldout_append_pattern` | `'\@!'` | Pattern determining whether to insert empty line in `foldout#append()`. |
+| `b, g` | `foldout_append_text` | `''` | Prefix text to insert in `foldout#append()`. |
+| `b` | `foldout_heading_comment` | 1 (0 for markdown) | Highlight heading delimiters as comments. |
+| `b` | `foldout_heading_string` | `commentstring` (`'%s'` for markdown) | Heading pattern, in `commentstring` format. |
+
+Use the vim help files (e.g. `:h foldout_options`) for documentation.
 
 ## Known issues
 
