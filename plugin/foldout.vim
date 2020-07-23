@@ -1,4 +1,4 @@
-" vim-foldout - Outline-based folding for any filetype.
+" vim-foldout - Outline-based folding with syntax highlighting.
 " Maintainer:   Matt Superdock
 " Version:      1.0
 " License:      MIT
@@ -10,14 +10,6 @@ else
 endif
 
 " ## Global options
-
-" Indicates whether to allow foldout to set default navigation mode bindings.
-" If 0, navigation mode uses only the bindings set manually with `foldout#map`.
-" This setting only applies to navigation mode; foldout never maps keys in any
-" of the standard vim modes.
-if !exists('g:foldout_bindings')
-  let g:foldout_bindings = 1
-endif
 
 " Pattern matched against file names to determine whether to enable foldout. If
 " the empty string, foldout is never automatically enabled. Defaults to `?*`,
@@ -90,44 +82,3 @@ if g:foldout_files != '' && g:foldout_save
   execute 'autocmd BufWinLeave ' . g:foldout_files . ' mkview'
 endif
 
-" ## Bindings
-
-" List from `https://hea-www.harvard.edu/~fine/Tech/vi.html`; removed `:`.
-let s:keys =
-  \ [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n'
-  \ , 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B'
-  \ , 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'
-  \ , 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3'
-  \ , '4', '5', '6', '7', '8', '9', '!', '@', '#', '$', '%', '^', '&', '*'
-  \ , '(', ')', '\', '-', '_', '=', '+', '[', ']', '{', '}', ';', "'", '`'
-  \ , '"', '~', ',', '.', '/', '<', '>', '?', '<c-a>' , '<c-b>' , '<c-c>'
-  \ , '<c-d>' , '<c-e>' , '<c-f>' , '<c-g>' , '<c-h>' , '<c-i>' , '<c-j>'
-  \ , '<c-k>' , '<c-l>' , '<c-m>' , '<c-n>' , '<c-o>' , '<c-p>' , '<c-q>'
-  \ , '<c-r>' , '<c-s>' , '<c-t>' , '<c-u>' , '<c-v>' , '<c-w>' , '<c-x>'
-  \ , '<c-y>' , '<c-z>' , '<c-\>' , '<c-]>' , '<c-^>' , '<c-_>' , '<c-?>'
-  \ , '\|'    , '<space>']
-
-" Stay in navigation mode on pressing unbound keys.
-for s:key in s:keys
-  if !foldout#submode#mapped('navigation', 'n', s:key)
-    call foldout#unmap(s:key)
-  endif
-endfor
-
-" Set default navigation mode bindings if desired by user.
-if g:foldout_bindings
-  call foldout#map('a', foldout#call('foldout#append()'), 1)
-  call foldout#map('b', foldout#call('foldout#bottom()'))
-  call foldout#map('c', foldout#call('foldout#center()'))
-  call foldout#map('f', foldout#call('foldout#focus()'))
-  call foldout#map('gj', foldout#call('foldout#down_graphical()'))
-  call foldout#map('gk', foldout#call('foldout#up_graphical()'))
-  call foldout#map('h', foldout#call('foldout#parent()'))
-  call foldout#map('j', foldout#call('foldout#down()'))
-  call foldout#map('k', foldout#call('foldout#up()'))
-  call foldout#map('l', foldout#call('foldout#child()'))
-  call foldout#map('o', foldout#call('foldout#open()'), 1)
-  call foldout#map('s', foldout#call('foldout#show()'))
-  call foldout#map('t', foldout#call('foldout#top()'))
-  call foldout#map('<tab>', foldout#call('foldout#toggle_fold()'))
-endif

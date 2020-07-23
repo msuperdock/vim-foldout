@@ -1,4 +1,4 @@
-" ## Enable & disable
+" ## Enable
 
 " Enable foldout in the current buffer. If called while foldout is already
 " enabled, apply current values of the buffer option variables.
@@ -10,13 +10,15 @@ function! foldout#enable()
 
   " Indicate whether to highlight heading delimiters as comments.
   if !exists('b:foldout_heading_comment')
-    let b:foldout_heading_comment = 1
+    let b:foldout_heading_comment
+      \ = &filetype == 'markdown' ? 0 : 1
   endif
 
   " Use '%s' as default if comment string is unchanged or empty.
   if !exists('b:foldout_heading_string')
     let b:foldout_heading_string
-      \ = &l:commentstring ==# '/*%s*/' ? '%s'
+      \ = &filetype == 'markdown' ? '%s'
+      \ : &l:commentstring ==# '/*%s*/' ? '%s'
       \ : &l:commentstring ==# '' ? '%s'
       \ : &l:commentstring
   endif
@@ -63,10 +65,6 @@ function! foldout#enable()
   if &l:foldtext !=# s:foldtext
     let &l:foldtext = s:foldtext
   endif
-
-  " Enter navigation mode on `<plug>FoldoutNavigation`.
-  call foldout#submode#enter_with('navigation', 'n', 'bs',
-    \ '<plug>FoldoutNavigation')
 
   augroup foldout
     autocmd!
@@ -631,25 +629,6 @@ function! foldout#open(...)
   call cursor(l:line + (l:before ? 2 : 1), s:heading_pos(l:new_level))
 endfunction
 
-" ## Mapping
-
-" Wrap the given expression with `:call` and `<cr>`, for mapping code.
-function! foldout#call(expr)
-  return ':call ' . a:expr . '<cr>'
-endfunction
-
-" Map `lhs` to `rhs` in navigation mode; the optional flag indicates that we
-" should leave navigation mode on this key.
-function! foldout#map(lhs, rhs, ...)
-  let l:options = a:0 >= 1 && a:1 ? 'bsx' : 'bs'
-  call foldout#submode#map('navigation', 'nx', l:options, a:lhs, a:rhs)
-endfunction
-
-" Make `lhs` stay in navigation mode without doing anything.
-function! foldout#unmap(lhs)
-  call foldout#submode#map('navigation', 'nx', 'bs', a:lhs, '<nop>')
-endfunction
-
 " Demote heading if at a heading, otherwise simulate tab.
 " Designed to be bound to `<tab>` in insert mode.
 function! foldout#tab()
@@ -670,20 +649,6 @@ function! foldout#shift_tab()
   endif
 endfunction
 
-" ## Option values
-
-" Store default foldout values of fillchars & foldtext.
-let s:fillchars = 'fold: '
-let s:foldlevel = 99
-let s:foldmethod = 'syntax'
-let s:foldtext = 'foldout#fold_text()'
-
-" Trivial string-valued function for the `foldtext` option. Note that it is not
-" possible to make this a script-local function.
-function! foldout#fold_text()
-  return ''
-endfunction
-
 " ## Query
 
 " View the stack of syntax groups at the cursor. Modified from
@@ -696,6 +661,20 @@ function! foldout#syntax()
   else
     echo '(none)'
   endif
+endfunction
+
+" ## Defaults
+
+" Store default foldout values of fillchars & foldtext.
+let s:fillchars = 'fold: '
+let s:foldlevel = 99
+let s:foldmethod = 'syntax'
+let s:foldtext = 'foldout#fold_text()'
+
+" Trivial string-valued function for the `foldtext` option. Note that it is not
+" possible to make this a script-local function.
+function! foldout#fold_text()
+  return ''
 endfunction
 
 " ## Utilities
@@ -841,3 +820,4 @@ function! s:pattern_end()
   let l:pattern = l:suffix == '' ? '$' : ' \zs' . s:escape(l:suffix[1:])
   return l:pattern
 endfunction
+

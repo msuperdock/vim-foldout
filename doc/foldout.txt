@@ -7,17 +7,15 @@ This plugin is only available if 'compatible' is not set.
 
 INTRODUCTION                                    *foldout*
 
-|foldout| provides an outline structure based on a hierarchy of headings. A
-heading is a string like "/* ## Title */", consisting of an optional prefix
-("/*") and suffix ("*/"), a string of heading symbols ("#"), and a title
-("Title"). The number of heading symbols determines the heading level. The
-default prefix and suffix are computed from 'commentstring', so in a code
-file, you can create a heading by typing your language's comment prefix
-followed by heading symbols, without any per-language configuration.
+|foldout| is an outline-based folding plugin for vim & neovim. Its unique feature
+is that folds are determined by Markdown-style headings within comments (e.g.
+"// # Heading"), and these headings are automatically highlighted. foldout also
+provides a suite of functions for inserting and navigating between headings.
 
-|foldout| provides syntax highlighting of headings, automatic folding based on
-the outline structure, and an additional vim mode called |navigation-mode|,
-which provides quick navigation of the outline structure.
+No per-filetype configuration is necessary; by default, |foldout| computes
+heading patterns from the value of vim's 'commentstring' option. As a result,
+you can type your language's comment prefix followed by a string of heading
+symbols (by default, "#"), and |foldout| will recognize a heading.
 
 INSTALLATION                                    *foldout-quickstart*
 
@@ -25,71 +23,16 @@ Use your preferred installation method; for example, with vim-plug, use:
 
 `Plug 'msuperdock/vim-foldout'`
 
-|foldout| can save and restore view data; this includes cursor position, open
-and closed folds, and anything else provided by vim's 'viewoptions' option. To
-enable this, remove any calls to |:mkview| and |:loadview| in your `.vimrc`
-and set |g:foldout_save|. (The |:mkview| and |:loadview| commands need to be
-called in certain sequence with |foldout| commands, and |foldout| handles this
-for you.) Consider also modifying 'viewoptions', which controls which view
-data is saved and restored; for example:
+|foldout| is automatically enabled by default in all buffers with non-empty file
+names. You can change this using the |g:foldout_files| variable; see below.
 
-`let &viewoptions = 'folds,cursor'`
+If your .vimrc uses |:mkview| or |:loadview| to save and restore view data,
+remove these commands and set |g:foldout_save|; for example:
+
 `let g:foldout_save = 1`
 
-To enable entering |navigation-mode|, bind a key to the special key sequence
-`<Plug>FoldoutNavigation`. Use |:map| rather than |:noremap| so that
-`<Plug>FoldoutNavigation` can be further expanded; for example:
-
-`map <leader>n <Plug>FoldoutNavigation`
-
-|foldout| is automatically enabled by default in all buffers with non-empty
-file names. You can change this using the |g:foldout_files| variable.
-
-BINDINGS                                        *foldout-bindings*
-                                                *navigation-mode*
-
-On `<Plug>FoldoutNavigation`, |foldout| enters |navigation-mode|; you will see
-"-- NAVIGATION --" below the status bar, and the following bindings are
-active:
-
-| key   | function                 | description                            |
-| ----- | ------------------------ | -------------------------------------- |
-| h     | |foldout#parent()|         | Go to parent heading.                  |
-|       |                          |                                        |
-| j     | |foldout#down()|           | Go to next sibling heading.            |
-|       |                          |                                        |
-| k     | |foldout#up()|             | Go to previous sibling heading.        |
-|       |                          |                                        |
-| l     | |foldout#child()|          | Go to first child heading.             |
-|       |                          |                                        |
-| gj    | |foldout#down_graphical()| | Go to next visible heading of any      |
-|       |                          |   level.                               |
-| gk    | |foldout#up_graphical()|   | Go to previous visible heading of any  |
-|       |                          |   level.                               |
-| t     | |foldout#top()|            | Go to first sibling heading.           |
-|       |                          |                                        |
-| b     | |foldout#bottom()|         | Go to last sibling heading.            |
-|       |                          |                                        |
-| <tab> | |foldout#toggle_fold|      | Toggle fold at cursor.                 |
-|       |                          |                                        |
-| s     | |foldout#show()|           | Open all folds.                        |
-|       |                          |                                        |
-| f     | |foldout#focus()|          | Close all folds but those necessary to |
-|       |                          |   see cursor.                          |
-| c     | |foldout#center()|         | Redraw so that cursor is vertically    |
-|       |                          |   centered.                            |
-| a     | |foldout#append()|         | Go to end of current section and enter |
-|       |                          |   insert mode.                         |
-| o     | |foldout#open()|           | Create heading below and enter insert  |
-|       |                          |   mode.                                |
-
-To customize |navigation-mode| bindings, |foldout| provides |foldout#map()|
-and |foldout#unmap()| functions. The above bindings are set in
-plugin/foldout.vim using `foldout#map()`; this is a good reference for
-customization.
-
-If you don't want |foldout| to set any |navigation-mode| bindings, set the
-|g:foldout_bindings| variable to 0.
+(The |:mkview| and |:loadview| commands need to be called in certain sequence
+with |foldout| commands, and |foldout| handles this for you.)
 
 OPTIONS                                         *foldout-options*
 
@@ -100,59 +43,89 @@ present. You can set an option in your .vimrc using, for example:
 
 `let g:foldout_heading_symbol = '*'`
 
-| prefix | variable                | default | description                  |
-| ------ | ----------------------- | ------- | ---------------------------- |
-| g      | |foldout_bindings|        | 1       | Allow foldout to set         |
-|        |                         |         |   |navigation-mode| bindings.  |
-| g      | |foldout_files|           | "?*"    | Pattern determining whether  |
-|        |                         |         |   to enable |foldout|.         |
-| g      | |foldout_save|            | 0       | Allow foldout to save &      |
-|        |                         |         |   restore view data.         |
-| b, g   | |foldout_heading_symbol|  | "#"     | Repeated symbol indicating   |
-|        |                         |         |   heading level.             |
-| b, g   | |foldout_max_level|       | 6       | Maximum allowed heading      |
-|        |                         |         |   level.                     |
-| b, g   | |foldout_min_fold|        | 1       | Minimum level at which to    |
-|        |                         |         |   enable folding.            |
-| b      | |foldout_heading_comment| | 1       | Highlight heading delimiters |
-|        |                         |         |   as comments.               |
-| b      | |foldout_heading_string|  | *       | Heading pattern, in          |
-|        |                         |         |   'commentstring' format.    |
+| prefix | variable                | default | description                     |
+| ------ | ----------------------- | ------- | ------------------------------- |
+| g      | |foldout_files|           | "?*"    | Pattern determining whether to  |
+|        |                         |         |   enable |foldout|.               |
+| g      | |foldout_save|            | 0       | Allow foldout to save & restore |
+|        |                         |         |   view data.                    |
+| b, g   | |foldout_heading_symbol|  | "#"     | Repeated symbol indicating      |
+|        |                         |         |   heading level.                |
+| b, g   | |foldout_max_level|       | 6       | Maximum allowed heading level.  |
+|        |                         |         |                                 |
+| b, g   | |foldout_min_fold|        | 1       | Minimum level at which to       |
+|        |                         |         |   enable folding.               |
+| b      | |foldout_heading_comment| | 1       | Highlight heading delimiters as |
+|        |                         |         |   comments.                     |
+| b      | |foldout_heading_string|  | *       | Heading pattern, in             |
+|        |                         |         |   'commentstring' format.       |
 
 * The default for |foldout_heading_string| is the value of 'commentstring'.
 
 Options governing the |foldout#append()| function:
 
-| b, g   | |foldout_append_pattern|  | "\@!"   | Pattern determining whether  |
-|        |                         |         |   to insert empty line.      |
-| b, g   | |foldout_append_text|     | ""      | Prefix text to insert.       |
-|        |                         |         |                              |
+| b, g   | |foldout_append_pattern|  | "\@!"   | Pattern determining whether to  |
+|        |                         |         |   insert empty line.            |
+| b, g   | |foldout_append_text|     | ""      | Prefix text to insert.          |
+|        |                         |         |                                 |
 
 FUNCTIONS                                       *foldout-functions*
 
-|foldout| provides the following functions, in addition to the functions bound
-in |navigation-mode|:
+|foldout| provides the following functions:
 
-| function              | description                                       |
-| --------------------- | ------------------------------------------------- |
-| |foldout#enable()|      | Enable foldout in the current buffer.             |
-| |foldout#disable()|     | Disable foldout in the current buffer.            |
-| |foldout#toggle()|      | Toggle foldout in the current buffer.             |
-| |foldout#level()|       | Get level of heading, or 0 if not at a heading.   |
-| |foldout#demote()|      | Demote current heading. Don't change children.    |
-| |foldout#promote()|     | Promote current heading. Don't change children.   |
-| |foldout#map|(lhs, rhs) | Map lhs to rhs in |navigation-mode|.                |
-| |foldout#unmap|(lhs)    | Unmap lhs in |navigation-mode|.                     |
-| |foldout#call|(expr)    | Convenience function for creating mappings.       |
-| |foldout#tab()|         | Demote if at heading, else simulate tab.          |
-| |foldout#shift_tab()|   | Promote if at heading, else simulate shift-tab.   |
-| |foldout#syntax()|      | View the stack of syntax groups at the cursor.    |
+Enable:
+
+| function                 | description                                       |
+| ------------------------ | ------------------------------------------------- |
+| |foldout#enable()|         | Enable foldout in the current buffer.             |
+| |foldout#disable()|        | Disable foldout in the current buffer.            |
+| |foldout#toggle()|         | Toggle foldout in the current buffer.             |
+
+Headings:
+
+| function                 | description                                       |
+| ------------------------ | ------------------------------------------------- |
+| |foldout#level()|          | Get level of heading, or 0 if not at a heading.   |
+| |foldout#demote()|         | Demote current heading. Don't change children.    |
+| |foldout#promote()|        | Promote current heading. Don't change children.   |
+| |foldout#tab()|            | Demote if at heading, else simulate tab.          |
+| |foldout#shift_tab()|      | Promote if at heading, else simulate shift-tab.   |
 
 The |foldout#tab()| and |foldout#shift_tab()| functions are designed to be
 bound to tab and shift-tab in insert mode; for example:
 
 `inoremap <tab> <c-\><c-o>:silent call foldout#tab()<cr>`
 `inoremap <s-tab> <c-\><c-o>:silent call foldout#shift_tab()<cr>`
+
+Navigation:
+
+| function                 | description                                       |
+| ------------------------ | ------------------------------------------------- |
+| |foldout#parent()|         | Go to parent heading.                             |
+| |foldout#down()|           | Go to next sibling heading.                       |
+| |foldout#up()|             | Go to previous sibling heading.                   |
+| |foldout#down_graphical()| | Go to next visible heading of any level.          |
+| |foldout#up_graphical()|   | Go to previous visible heading of any level.      |
+| |foldout#top()|            | Go to first sibling heading.                      |
+| |foldout#bottom()|         | Go to last sibling heading.                       |
+| |foldout#child()|          | Go to first child heading.                        |
+| |foldout#goto()|           | Go to heading with given name & level.            |
+
+Folding:
+
+| |foldout#toggle_fold|      | Toggle fold at cursor.                            |
+| |foldout#show()|           | Open all folds.                                   |
+| |foldout#focus()|          | Close all folds but those needed to see cursor.   |
+| |foldout#center()|         | Redraw so that cursor is vertically centered.     |
+
+Insertion:
+
+| |foldout#append()|         | Go to end of current section, enter insert mode.  |
+| |foldout#open()|           | Create heading below and enter insert mode.       |
+
+Query:
+
+| |foldout#syntax()|         | View the stack of syntax groups at the cursor.    |
 
 KNOWN ISSUES                                    *foldout-known-issues*
 
@@ -214,26 +187,14 @@ the affected filetype, or modify the syntax file yourself to replace `ALL` or
 
 CREDITS                                         *foldout-credits*
 
-|foldout| relies critically on two plugins:
-
-- vim-submode: provides the framework for |navigation-mode|.
-- FastFold: makes certain folding operations much more efficient.
-
-Both are slightly modified and packaged with |foldout|. If you like |foldout|,
-give these plugins some love, too.
+|foldout| relies critically on the FastFold plugin, which is slightly modified
+and packaged with foldout.
 
 DOCUMENTATION                                   *foldout-documentation*
 
 Below is documentation for each option and function provided by |foldout|.
 
 Options:
-
-                                                *g:foldout_bindings*
-g:foldout_bindings          number (default 1) 
-        Indicates whether to allow |foldout| to set default |navigation-mode|
-        bindings. If 0, |navigation-mode| uses only the bindings set manually
-        with |foldout#map|. This setting only applies to |navigation-mode|;
-        |foldout| never maps keys in any of the standard vim modes.
 
                                                 *g:foldout_files*
 g:foldout_files             string (default "?*")
@@ -318,27 +279,35 @@ foldout#demote()                                *foldout#demote()*
 foldout#promote()                               *foldout#promote()*
         If at a heading, promote the heading. Do not change the child headings.
 
-foldout#up()                                    *foldout#up()*
-        Go to previous sibling heading, if at a heading and if there is one.
+foldout#tab()                                   *foldout#tab()*
+        Demote heading if at a heading, otherwise simulate tab. Designed to be
+        bound to <tab> in insert mode.
 
-foldout#up_graphical()                          *foldout#up_graphical()*
-        Go to previous visible heading, if there is one.
+foldout#shift_tab()                             *foldout#shift_tab()*
+        Promote heading if at a heading, otherwise simulate shift-tab.
+        Designed to be bound to <shift-tab> in insert mode.
+
+foldout#parent()                                *foldout#parent()*
+        Go to parent heading, if there is one.
 
 foldout#down()                                  *foldout#down()*
         Go to next sibling heading, if at a heading and if there is one. If
         not at a heading, go to the next heading if it is a first child.
 
+foldout#up()                                    *foldout#up()*
+        Go to previous sibling heading, if at a heading and if there is one.
+
 foldout#down_graphical()                        *foldout#down_graphical()*
         Go to next visible heading, if there is one.
+
+foldout#up_graphical()                          *foldout#up_graphical()*
+        Go to previous visible heading, if there is one.
 
 foldout#top()                                   *foldout#top()*
         Go to first sibling if at a heading, else to beginning of section.
 
 foldout#bottom()                                *foldout#bottom()*
         Go to last sibling if at a heading, else to end of section.
-
-foldout#parent()                                *foldout#parent()*
-        Go to parent heading, if there is one.
 
 foldout#child()                                 *foldout#child()*
         Go to first nonempty line inside a heading, if there is one.
@@ -368,23 +337,6 @@ foldout#open([{cursor}])                        *foldout#open()*
         {cursor} is given, create heading at cursor, regardless of outline
         structure. Otherwise, create heading at the end of the section.
 
-foldout#call({expr})                            *foldout#call()*
-        Wrap the given expression with ":call" and "<cr>", for mapping code.
-
-foldout#map({lhs}, {rhs}, {leave})              *foldout#map()*
-        Map {lhs} to {rhs} in |navigation-mode|. If {leave} is given, leave
-        |navigation-mode| on this key.
-
-foldout#unmap({lhs})                            *foldout#unmap()*
-        Make {lhs} stay in |navigation-mode| without doing anything.
-
-foldout#tab()                                   *foldout#tab()*
-        Demote heading if at a heading, otherwise simulate tab. Designed to be
-        bound to <tab> in insert mode.
-
-foldout#shift_tab()                             *foldout#shift_tab()*
-        Promote heading if at a heading, otherwise simulate shift-tab.
-        Designed to be bound to <shift-tab> in insert mode.
-
 foldout#syntax()                                *foldout#syntax()*
         View the stack of syntax groups at the cursor.
+
