@@ -42,6 +42,10 @@ your .vimrc using, for example:
 
 `noremap <silent> <tab> :call foldout#toggle_fold()<cr>`
 
+This binds "<tab>" to the |foldout#toggle_fold()| function in normal, visual,
+select, and operator-pending modes. The "<silent>" flag tells vim to call the
+function without first displaying the keybinding.
+
 Enable:
 
 | function                 | description                                       |
