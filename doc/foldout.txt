@@ -15,8 +15,8 @@ suite of functions for manipulating and navigating between headings.
 |foldout| uses vim's 'commentstring' option to compute default heading patterns.
 As a result, in a code file, if you're using a language-specific plugin that
 sets 'commentstring', no further configuration is necessary. Just type the
-language's comment prefix followed by a string of heading symbols (by default,
-"#"), and |foldout| will recognize a heading.
+language's comment prefix, then a string of heading symbols (by default, "#"),
+and |foldout| will recognize a heading.
 
 INSTALLATION                                    *foldout-quickstart*
 
