@@ -54,8 +54,8 @@ let g:foldout_heading_symbol = '*'
 | `b, g` | `foldout_min_fold` | 1 | Minimum level at which to enable folding. |
 | `b, g` | `foldout_append_pattern` | `'\@!'` | Pattern determining whether to insert empty line in `foldout#append()`. |
 | `b, g` | `foldout_append_text` | `''` | Prefix text to insert in `foldout#append()`. |
-| `b` | `foldout_heading_comment` | 1 | Highlight heading delimiters as comments. |
-| `b` | `foldout_heading_string` | `commentstring` | Heading pattern, in `commentstring` format. |
+| `b` | `foldout_heading_comment` | 1 (0 for Markdown) | Highlight heading delimiters as comments. |
+| `b` | `foldout_heading_string` | `commentstring` (`%s` for Markdown) | Heading pattern, in `commentstring` format. |
 
 Use the vim help files (e.g. `:h foldout_options`) for documentation.
 
