@@ -183,7 +183,7 @@ The heading is now detected, and the JavaScript highlighting is unchanged.
 
 (2) Syntax files using `contains=ALL` or `contains=CONTAINED`.
 
-A syntax file may use `contains=ALL` to indicate that within a match or region,
+Some syntax files use `contains=ALL` to indicate that within a match or region,
 all match groups are in scope, which may cause unexpected highlighting when used
 with |foldout|. The issue is that foldout relies on carefully controlling where
 its own syntax groups may match, which is impossible in the presence of the
