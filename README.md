@@ -21,19 +21,18 @@ Use your preferred installation method; for example, with
 Plug 'msuperdock/vim-foldout'
 ```
 
-foldout is automatically enabled by default in all buffers whose filenames
-contain an extension. You can change this using the `g:foldout_files` variable;
-see below.
-
 If your `.vimrc` uses `mkview` or `loadview` to save and restore view data,
-remove these commands and set `g:foldout_save`; for example:
+remove these commands and set `g:foldout_save`. (The `mkview` and `loadview`
+commands need to be called in certain sequence with foldout commands, and
+foldout handles this for you.) For example:
 
 ```
 let g:foldout_save = 1
 ```
 
-(The `mkview` and `loadview` commands need to be called in certain sequence with
-foldout commands, and foldout handles this for you.)
+foldout is automatically enabled by default in all buffers whose filenames
+contain an extension. You can change this using the `g:foldout_files` variable;
+see below.
 
 ## Options
 
@@ -137,13 +136,13 @@ by zero or more non-foldout-related groups, for example:
 foldoutFile, foldoutChildren, foldoutBody1, foldoutContent, javaScriptIdentifier -> Identifier
 ```
 
-If you do not see this general pattern of groups, then you are experiencing a
-foldout-related issue. The two known issues are:
+If you do not see this general pattern, you are experiencing a foldout-related
+issue. The two known issues are:
 
 ### Files beginning with keywords
 
-If a file begins with a keyword, then no foldout headings are detected. For
-example, consider the following JavaScript file:
+If a file begins with a keyword, then no headings are detected. For example,
+consider the following JavaScript file:
 
 ```
 var x = 2
@@ -186,11 +185,11 @@ with foldout. The issue is that foldout relies on carefully controlling where
 its own syntax groups may match, which is impossible in the presence of the
 `contains=ALL` construct. (Similar remarks apply to `contains=CONTAINED`.)
 
-The higher-quality syntax files tend to avoid these constructs in favor of
-explicit lists of contained clusters and syntax groups. If you encounter this
-issue, consider using a vim plugin that provides an alternative syntax file for
-the affected filetype, or modify the syntax file yourself to replace `ALL` or
-`CONTAINED` with explicit lists of contained clusters and syntax groups.
+The better syntax files avoid these constructs in favor of explicit lists of
+contained clusters and syntax groups. If you encounter this issue, consider
+using a vim plugin that provides an alternative syntax file for the affected
+filetype, or modify the syntax file yourself to replace the `ALL` or `CONTAINED`
+keywords wherever they appear.
 
 ## Changelog
 
