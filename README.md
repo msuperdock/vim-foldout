@@ -3,13 +3,15 @@
 ![demo](https://github.com/msuperdock/vim-foldout/raw/master/demo.gif)
 
 foldout is an outline-based folding plugin for vim & neovim. Its unique feature
-is that folds are determined by Markdown-style headings within comments (e.g.
-`// # Heading`), and these headings are automatically highlighted. No
-per-filetype configuration is necessary; by default, foldout computes heading
-patterns from the value of vim's `commentstring` option. As a result, in a code
-file, you can type the language's comment prefix followed by a string of heading
-symbols (by default, `#`), and foldout will recognize a heading. foldout also
-provides a suite of functions for manipulating and navigating between headings.
+is that folds are determined by Markdown-style headings within comments, and
+these headings are automatically highlighted. foldout also provides a suite of
+functions for manipulating and navigating between headings.
+
+foldout uses vim's `commentstring` option to compute default heading patterns.
+As a result, in a code file, if you're already using a language-specific plugin
+that sets `commentstring`, no further configuration is necessary. Just type the
+language's comment prefix followed by a string of heading symbols (by default,
+`#`), and foldout will recognize a heading.
 
 ## Installation
 
