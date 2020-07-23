@@ -1,6 +1,6 @@
 " vim-foldout - Outline-based folding with syntax highlighting.
 " Maintainer:   Matt Superdock
-" Version:      1.0
+" Version:      2.0
 " License:      MIT
 
 if exists('g:foldout_loaded')

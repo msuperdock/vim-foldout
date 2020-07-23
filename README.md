@@ -191,6 +191,14 @@ issue, consider using a vim plugin that provides an alternative syntax file for
 the affected filetype, or modify the syntax file yourself to replace `ALL` or
 `CONTAINED` with explicit lists of contained clusters and syntax groups.
 
+## Changelog
+
+### [2.0] - 2020-07-22
+
+- Removed navigation mode. (If you relied on this, tell me by filing an issue.)
+- `b:foldout_heading_comment` now defaults to `0` in Markdown files.
+- `b:foldout_heading_string` now defaults to `%s` in Markdown files.
+
 ## Credits
 
 foldout relies critically on the [FastFold](https://github.com/Konfekt/FastFold)
