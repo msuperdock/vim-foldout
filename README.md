@@ -21,8 +21,9 @@ Use your preferred installation method; for example, with
 Plug 'msuperdock/vim-foldout'
 ```
 
-foldout is automatically enabled by default in all buffers with non-empty file
-names. You can change this using the `g:foldout_files` variable; see below.
+foldout is automatically enabled by default in all buffers whose filenames
+contain an extension. You can change this using the `g:foldout_files` variable;
+see below.
 
 If your `.vimrc` uses `mkview` or `loadview` to save and restore view data,
 remove these commands and set `g:foldout_save`; for example:
@@ -47,21 +48,21 @@ let g:foldout_heading_symbol = '*'
 
 | prefix | variable | default | description |
 | --- | --- | --- | --- |
-| `g` | `foldout_files` | `'?*'` | Pattern determining whether to enable foldout. |
+| `g` | `foldout_files` | `'*.*'` | Pattern determining whether to enable foldout. |
 | `g` | `foldout_save` | 0 | Allow foldout to save & restore view data. |
 | `b, g` | `foldout_heading_symbol` | `'#'` | Repeated symbol indicating heading level. |
 | `b, g` | `foldout_max_level` | 6 | Maximum allowed heading level. |
 | `b, g` | `foldout_min_fold` | 1 | Minimum level at which to enable folding. |
 | `b, g` | `foldout_append_pattern` | `'\@!'` | Pattern determining whether to insert empty line in `foldout#append()`. |
 | `b, g` | `foldout_append_text` | `''` | Prefix text to insert in `foldout#append()`. |
-| `b` | `foldout_heading_comment` | 1 (0 for Markdown) | Highlight heading delimiters as comments. |
-| `b` | `foldout_heading_string` | `commentstring` (`%s` for Markdown) | Heading pattern, in `commentstring` format. |
+| `b` | `foldout_heading_comment` | 1 (0 for markdown) | Highlight heading delimiters as comments. |
+| `b` | `foldout_heading_string` | `commentstring` (`'%s'` for markdown) | Heading pattern, in `commentstring` format. |
 
 Use the vim help files (e.g. `:h foldout_options`) for documentation.
 
 ## Functions
 
-foldout provides the following functions:
+foldout provides the following functions, which you may want to bind to keys:
 
 ### Enable
 
@@ -196,6 +197,7 @@ the affected filetype, or modify the syntax file yourself to replace `ALL` or
 ### [2.0] - 2020-07-22
 
 - Removed navigation mode. (If you relied on this, tell me by filing an issue.)
+- `g:foldout_files` now defaults to `*.*`, matching files with extensions.
 - `b:foldout_heading_comment` now defaults to `0` in Markdown files.
 - `b:foldout_heading_string` now defaults to `%s` in Markdown files.
 

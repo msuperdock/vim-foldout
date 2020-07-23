@@ -23,8 +23,9 @@ Use your preferred installation method; for example, with vim-plug, use:
 
 `Plug 'msuperdock/vim-foldout'`
 
-|foldout| is automatically enabled by default in all buffers with non-empty file
-names. You can change this using the |g:foldout_files| variable; see below.
+|foldout| is automatically enabled by default in all buffers whose filenames
+contain an extension. You can change this using the |g:foldout_files|
+variable; see below.
 
 If your .vimrc uses |:mkview| or |:loadview| to save and restore view data,
 remove these commands and set |g:foldout_save|; for example:
@@ -45,7 +46,7 @@ present. You can set an option in your .vimrc using, for example:
 
 | prefix | variable                | default | description                     |
 | ------ | ----------------------- | ------- | ------------------------------- |
-| g      | |foldout_files|           | "?*"    | Pattern determining whether to  |
+| g      | |foldout_files|           | "*.*"   | Pattern determining whether to  |
 |        |                         |         |   enable |foldout|.               |
 | g      | |foldout_save|            | 0       | Allow foldout to save & restore |
 |        |                         |         |   view data.                    |
@@ -56,11 +57,12 @@ present. You can set an option in your .vimrc using, for example:
 | b, g   | |foldout_min_fold|        | 1       | Minimum level at which to       |
 |        |                         |         |   enable folding.               |
 | b      | |foldout_heading_comment| | 1       | Highlight heading delimiters as |
-|        |                         |         |   comments.                     |
-| b      | |foldout_heading_string|  | *       | Heading pattern, in             |
-|        |                         |         |   'commentstring' format.       |
+|        |                         | (0)*    |   comments.                     |
+| b      | |foldout_heading_string|  | **      | Heading pattern, in             |
+|        |                         | ("%s")* |   'commentstring' format.       |
 
-* The default for |foldout_heading_string| is the value of 'commentstring'.
+* This is an alternative default, for Markdown files only.
+** The default for |foldout_heading_string| is the value of 'commentstring'.
 
 Options governing the |foldout#append()| function:
 
@@ -71,7 +73,7 @@ Options governing the |foldout#append()| function:
 
 FUNCTIONS                                       *foldout-functions*
 
-|foldout| provides the following functions:
+|foldout| provides the following functions, which you may want to bind to keys:
 
 Enable:
 

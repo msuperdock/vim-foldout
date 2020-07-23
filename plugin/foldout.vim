@@ -12,10 +12,9 @@ endif
 " ## Global options
 
 " Pattern matched against file names to determine whether to enable foldout. If
-" the empty string, foldout is never automatically enabled. Defaults to `?*`,
-" which matches all non-empty strings.
+" the empty string, foldout is never automatically enabled. Defaults to `*.*`.
 if !exists('g:foldout_files')
-  let g:foldout_files = '?*'
+  let g:foldout_files = '*.*'
 endif
 
 " Indicates whether to let foldout handle saving and loading view data.
