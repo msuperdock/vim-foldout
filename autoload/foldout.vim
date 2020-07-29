@@ -510,7 +510,7 @@ endfunction
 " Toggle current fold, moving down one line if at a header.
 function! foldout#toggle_fold()
   try
-  if getline('.') =~ s:pattern_any()
+  if foldout#level() > 0
     FastFoldUpdate
     execute "silent normal! jzak"
   else
@@ -534,6 +534,11 @@ function! foldout#focus()
   do Syntax
   %foldclose!
   normal! zv
+
+  if foldout#level() > 0
+    FastFoldUpdate
+    execute "silent normal! jzak"
+  endif
 endfunction
 
 " Center the cursor vertically, without moving the cursor.
