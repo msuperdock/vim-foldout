@@ -532,7 +532,7 @@ endfunction
 " Focus the cursor by closing all other folds.
 function! foldout#focus()
   do Syntax
-  %foldclose!
+  silent! %foldclose!
   normal! zv
 
   if foldout#level() > 0
