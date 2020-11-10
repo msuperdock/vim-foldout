@@ -124,6 +124,8 @@ present. You can set an option in your .vimrc using, for example:
 |        |                         |         |   enable folding.               |
 | b      | |foldout_heading_comment| | 1       | Highlight heading delimiters as |
 |        |                         | (0)*    |   comments.                     |
+| b      | |foldout_heading_ignore|  | "\@!"   | Pattern determining whether to  |
+|        |                         |         |   ignore section.               |
 | b      | |foldout_heading_string|  | **      | Heading pattern, in             |
 |        |                         | ("%s")* |   'commentstring' format.       |
 
@@ -136,6 +138,8 @@ Options governing the |foldout#append()| function:
 |        |                         |         |   insert empty line.            |
 | b, g   | |foldout_append_text|     | ""      | Prefix text to insert.          |
 |        |                         |         |                                 |
+
+Note that `'\@!'` is a pattern which never matches.
 
 KNOWN ISSUES                                    *foldout-known-issues*
 
@@ -246,6 +250,13 @@ b:foldout_min_fold          local to buffer
 b:foldout_heading_comment   number (default 1)
                             local to buffer
         Indicates whether to highlight heading delimiters as comments.
+
+                                                *b:foldout_heading_ignore*
+b:foldout_heading_ignore    string (default "\@!")
+                            local to buffer
+        Pattern matched against headings. If it matches, no syntax highlighting
+        is done in the subsequent section, and no subheadings are recognized.
+        The default value is the null pattern, which never matches.
 
                                                 *b:foldout_heading_string*
 b:foldout_heading_string    string (defaults to value of 'commentstring')

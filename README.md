@@ -132,9 +132,11 @@ let g:foldout_heading_symbol = '*'
 | `b, g` | `foldout_append_pattern` | `'\@!'` | Pattern determining whether to insert empty line in `foldout#append()`. |
 | `b, g` | `foldout_append_text` | `''` | Prefix text to insert in `foldout#append()`. |
 | `b` | `foldout_heading_comment` | 1 (0 for markdown) | Highlight heading delimiters as comments. |
+| `b` | `foldout_heading_ignore` | `'\@!'` | Pattern determining whether to ignore section. |
 | `b` | `foldout_heading_string` | `commentstring` (`'%s'` for markdown) | Heading pattern, in `commentstring` format. |
 
-Use the vim help files (e.g. `:h foldout_options`) for documentation.
+Note that `'\@!'` is a pattern which never matches. See the vim help files (e.g.
+`:h foldout_options`) for more documentation.
 
 ## Known issues
 

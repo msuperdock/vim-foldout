@@ -14,6 +14,10 @@ function! foldout#enable()
       \ = &filetype == 'markdown' ? 0 : 1
   endif
 
+  if !exists('b:foldout_heading_ignore')
+    let b:foldout_heading_ignore = '\@!'
+  endif
+
   " Use '%s' as default if comment string is unchanged or empty.
   if !exists('b:foldout_heading_string')
     let b:foldout_heading_string
@@ -113,14 +117,24 @@ function! foldout#enable()
     " Execute syntax commands to recognize various heading levels.
     for l:i in range(1, b:foldout_max_level)
       execute 'autocmd Syntax * syntax match foldoutHeadingLine' . l:i . ' '
-        \ . s:quote(s:pattern_exact(l:i)) . ' '
+        \ . s:quote(s:pattern_exact('.*', l:i)) . ' '
         \ . 'nextgroup=foldoutBody' . l:i . ' '
+        \ . 'contains=foldoutHeading '
+        \ . 'contained keepend skipnl'
+      execute 'autocmd Syntax * syntax match foldoutHeadingLine' . l:i . ' '
+        \ . s:quote(s:pattern_exact(b:foldout_heading_ignore, l:i)) . ' '
+        \ . 'nextgroup=foldoutBodyPlain' . l:i . ' '
         \ . 'contains=foldoutHeading '
         \ . 'contained keepend skipnl'
       execute 'autocmd Syntax * syntax region foldoutBody' . l:i . ' '
         \ . 'start="\_." end=' . s:quote(s:zero_width(s:pattern_max(l:i))) . ' '
         \ . 'contains=foldoutContent'
         \ . (l:i < b:foldout_max_level ? ',foldoutChildren ' : ' ')
+        \ . (l:i >= b:foldout_min_fold ? 'fold ' : '')
+        \ . 'contained keepend'
+      execute 'autocmd Syntax * syntax region foldoutBodyPlain' . l:i . ' '
+        \ . 'start="\_." end=' . s:quote(s:zero_width(s:pattern_max(l:i))) . ' '
+        \ . 'contains=NONE '
         \ . (l:i >= b:foldout_min_fold ? 'fold ' : '')
         \ . 'contained keepend'
     endfor
@@ -767,28 +781,38 @@ endfunction
 " The prefix pattern matches everything up to the heading symbols.
 " The suffix pattern matches everything after the heading symbols.
 " Include a space after prefix if nonempty, and before suffix if nonempty.
+" Takes a pattern to match the heading against.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_split(...)
+function! s:pattern_split(heading, ...)
   let [l:prefix, l:suffix] = s:heading_split()
-  return
-    \ [ '^\s*' . s:escape(l:prefix)
-    \ , (get(a:, 1, 0) ? '\ze' : '') . ' .*' . s:escape(l:suffix) . '.*$'
-    \ ]
+
+  let l:prefix_pattern
+    \ = '^\s*'
+    \ . s:escape(l:prefix)
+  let l:suffix_pattern
+    \ = (get(a:, 1, 0) ? '\ze' : '')
+    \ . ' '
+    \ . a:heading
+    \ . s:escape(l:suffix)
+    \ . '.*$'
+
+  return [l:prefix_pattern, l:suffix_pattern]
 endfunction
 
 " Compute a pattern representing a heading of exactly the given level.
 " The pattern expects a space character after the prefix if prefix nonempty.
 " The pattern expects a space character before the suffix if suffix nonempty.
+" Takes a pattern to match the heading against.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_exact(level, ...)
-  let [l:prefix, l:suffix] = s:pattern_split(get(a:, 1, 0))
+function! s:pattern_exact(heading, level, ...)
+  let [l:prefix, l:suffix] = s:pattern_split(a:heading, get(a:, 1, 0))
   return l:prefix . repeat(b:foldout_heading_symbol, a:level) . l:suffix
 endfunction
 
 " A pattern representing a top-level heading.
 " With optional flag, include a `\ze` after the caret.
 function! s:pattern_top(...)
-  return s:pattern_exact(1, get(a:, 1, 0))
+  return s:pattern_exact('.*', 1, get(a:, 1, 0))
 endfunction
 
 " Compute a pattern representing a heading of at most the given level.
@@ -798,7 +822,7 @@ function! s:pattern_max(level, ...)
     return s:pattern_top(get(a:, 1, 0))
   endif
 
-  let [l:prefix, l:suffix] = s:pattern_split(get(a:, 1, 0))
+  let [l:prefix, l:suffix] = s:pattern_split('.*', get(a:, 1, 0))
   return l:prefix
     \ . b:foldout_heading_symbol
     \ . '\%[' . repeat(b:foldout_heading_symbol, a:level - 1) . ']'
@@ -813,7 +837,7 @@ endfunction
 
 " A pattern representing the start of a heading of any level, up to the title.
 function! s:pattern_start()
-  return s:pattern_split()[0]
+  return s:pattern_split('.*')[0]
     \ . b:foldout_heading_symbol
     \ . '\%[' . repeat(b:foldout_heading_symbol, b:foldout_max_level - 1) . ']'
     \ . '\ze '

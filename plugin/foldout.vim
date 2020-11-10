@@ -54,7 +54,7 @@ endif
 
 " Pattern matched against last line of section in `foldout#append`. If it
 " matches, an empty line is inserted before appending text. The default value
-" matches nothing, so that an empty line is always inserted.
+" is the null pattern, to always insert an empty line.
 if !exists('g:foldout_append_pattern')
   let g:foldout_append_pattern = '\@!'
 endif
