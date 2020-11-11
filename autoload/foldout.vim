@@ -2,7 +2,7 @@
 
 " Enable foldout in the current buffer. If called while foldout is already
 " enabled, apply current values of the buffer option variables.
-function! foldout#enable()
+function foldout#enable()
   " Set variable indicating that foldout is enabled.
   let b:foldout_enabled = 1
 
@@ -145,7 +145,7 @@ function! foldout#enable()
 endfunction
 
 " Disable foldout in the current buffer.
-function! foldout#disable()
+function foldout#disable()
   " Set variable indicating that foldout is disabled.
   let b:foldout_enabled = 0
 
@@ -194,7 +194,7 @@ function! foldout#disable()
 endfunction
 
 " Enable or disable foldout.
-function! foldout#toggle()
+function foldout#toggle()
   if b:foldout_enabled
     call foldout#disable()
   else
@@ -206,14 +206,14 @@ endfunction
 
 " Determine the current heading level at the given line, or at the cursor if no
 " argument is given. Return 0 if not at a heading.
-function! foldout#level(...)
+function foldout#level(...)
   let l:line = get(a:, 1, '.')
   let l:match = matchend(getline(l:line), s:pattern_any(2))
   return l:match >= 0 ? l:match - s:prefix_length() : 0
 endfunction
 
 " If at a heading, demote the heading. Do not change the child headings.
-function! foldout#demote()
+function foldout#demote()
   let l:level = foldout#level()
 
   " Handle cases where heading cannot be demoted.
@@ -239,7 +239,7 @@ function! foldout#demote()
 endfunction
 
 " If at a heading, promote the heading. Do not change the child headings.
-function! foldout#promote()
+function foldout#promote()
   let l:level = foldout#level()
 
   " Handle cases where heading cannot be promoted.
@@ -264,7 +264,7 @@ endfunction
 " ## Navigation
 
 " Go to previous sibling heading, if at a heading and if there is one.
-function! foldout#up()
+function foldout#up()
   let l:level = foldout#level()
   if l:level
     if s:up_helper(l:level)
@@ -277,7 +277,7 @@ endfunction
 
 " Go to previous sibling heading, if at a heading and if there is one.
 " Assume cursor is at heading. Return 0 if successful, 1 if no heading found.
-function! s:up_helper(level)
+function s:up_helper(level)
   let l:line = line('.')
   let l:col = col('.')
   call cursor(l:line, 1)
@@ -291,7 +291,7 @@ function! s:up_helper(level)
 endfunction
 
 " Go to previous visible heading, if there is one.
-function! foldout#up_graphical()
+function foldout#up_graphical()
   let l:line = line('.')
   let l:col = col('.')
 
@@ -321,7 +321,7 @@ endfunction
 
 " Go to next sibling heading, if at a heading and if there is one. If not at a
 " heading, go to the next heading if it is a first child.
-function! foldout#down()
+function foldout#down()
   let l:level = foldout#level()
   if l:level
     if s:down_helper(l:level)
@@ -350,7 +350,7 @@ endfunction
 
 " Go to the next sibling heading, if at a heading and if there is one. Assume
 " cursor is at heading. Return 0 if successful, 1 if no heading found.
-function! s:down_helper(level)
+function s:down_helper(level)
   let l:match = search(s:pattern_max(a:level), 'nW')
   if l:match && foldout#level(l:match) == a:level
     call cursor(l:match, 1)
@@ -360,7 +360,7 @@ function! s:down_helper(level)
 endfunction
 
 " Go to next visible heading, if there is one.
-function! foldout#down_graphical()
+function foldout#down_graphical()
   let l:line = line('.')
   let l:col = col('.')
 
@@ -389,7 +389,7 @@ function! foldout#down_graphical()
 endfunction
 
 " Go to first sibling if at a heading, else to beginning of section.
-function! foldout#top()
+function foldout#top()
   let l:level = foldout#level()
 
   " If at a heading, go to first sibling.
@@ -416,7 +416,7 @@ function! foldout#top()
 endfunction
 
 " Go to last sibling if at a heading, else to end of section.
-function! foldout#bottom()
+function foldout#bottom()
   let l:level = foldout#level()
 
   " If at a heading, go to last sibling.
@@ -447,7 +447,7 @@ function! foldout#bottom()
 endfunction
 
 " Go to parent heading, if there is one.
-function! foldout#parent()
+function foldout#parent()
   let l:level = foldout#level()
   
   " If cursor is not at a heading, go up to the nearest heading.
@@ -477,7 +477,7 @@ function! foldout#parent()
 endfunction
 
 " Go to first nonempty line inside a heading, if there is one.
-function! foldout#child()
+function foldout#child()
   let l:level = foldout#level()
   if l:level == 0
     echo 'Not at a heading.'
@@ -502,7 +502,7 @@ endfunction
 " Search for the given heading at the given level; go to heading if found.
 " The optional argument indicates whether to enter the section.
 " Return 1 if heading is not found, 0 otherwise.
-function! foldout#goto(name, level, ...)
+function foldout#goto(name, level, ...)
   let [l:prefix, l:suffix] = s:heading_split()
   let l:pattern = '^'
     \ . s:escape(l:prefix)
@@ -522,7 +522,7 @@ endfunction
 " ## Folding
 
 " Toggle current fold, moving down one line if at a header.
-function! foldout#toggle_fold()
+function foldout#toggle_fold()
   try
   if foldout#level() > 0
     FastFoldUpdate
@@ -539,12 +539,12 @@ function! foldout#toggle_fold()
 endfunction
 
 " Show all folds in buffer.
-function! foldout#show()
+function foldout#show()
   %foldopen!
 endfunction
 
 " Focus the cursor by closing all other folds.
-function! foldout#focus()
+function foldout#focus()
   do Syntax
   silent! %foldclose!
   normal! zv
@@ -556,14 +556,14 @@ function! foldout#focus()
 endfunction
 
 " Center the cursor vertically, without moving the cursor.
-function! foldout#center()
+function foldout#center()
   normal! zz
 endfunction
 
 " ## Insertion
 
 " Append a new line to the end of the current section, enter insert mode.
-function! foldout#append()
+function foldout#append()
   " Find `end`, the last line of the current section, and move cursor there.
   let l:heading = search(s:pattern_any(), 'nW')
   let l:end = l:heading ? l:heading - 1 : search('\%$', 'nW')
@@ -601,7 +601,7 @@ endfunction
 " Open a new heading line, meant as the foldout analogue of `o`.
 " The optional argument indicates whether to always insert at the cursor.
 " The default behavior is to insert at the end of a section.
-function! foldout#open(...)
+function foldout#open(...)
   let l:cursor = a:0 >= 1 && a:1
   let l:line = line('.')
   let l:level = foldout#level()
@@ -650,7 +650,7 @@ endfunction
 
 " Demote heading if at a heading, otherwise simulate tab.
 " Designed to be bound to `<tab>` in insert mode.
-function! foldout#tab()
+function foldout#tab()
   if foldout#level() > 0 && col('.') <= s:heading_pos(foldout#level())
     call foldout#demote()
   else
@@ -660,7 +660,7 @@ endfunction
 
 " Promote heading if at a heading, otherwise simulate shift-tab.
 " Designed to be bound to `<shift-tab>` in insert mode.
-function! foldout#shift_tab()
+function foldout#shift_tab()
   if foldout#level() > 0 && col('.') <= s:heading_pos(foldout#level())
     call foldout#promote()
   else
@@ -672,7 +672,7 @@ endfunction
 
 " View the stack of syntax groups at the cursor. Modified from
 " https://stackoverflow.com/questions/9464844/how-to-get-group-name-of-highlighting-under-cursor-in-vim.
-function! foldout#syntax()
+function foldout#syntax()
   if exists("*synstack")
     let l:g = synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
     let l:s = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
@@ -692,7 +692,7 @@ let s:foldtext = 'foldout#fold_text()'
 
 " Trivial string-valued function for the `foldtext` option. Note that it is not
 " possible to make this a script-local function.
-function! foldout#fold_text()
+function foldout#fold_text()
   return ''
 endfunction
 
@@ -701,7 +701,7 @@ endfunction
 " ### Wrapping strings
 
 " Create a pattern that matches exactly the given string, by escaping chars.
-function! s:escape(str)
+function s:escape(str)
   " Backslash must come first to not interfere with other substitutions.
   let l:chars = ['\', '*', '^', '$', '.', '~', '[', ']']
 
@@ -715,7 +715,7 @@ function! s:escape(str)
 endfunction
 
 " Wrap a pattern within an appropriate character, for syntax commands.
-function! s:quote(pattern)
+function s:quote(pattern)
   " Characters usable as pattern delimiters, in rough order of preference.
   let l:chars =
     \ [ '"', "'", '`', '/', '+', '~', '!', '@', '#', '$', '%', '^', '&', '*'
@@ -732,7 +732,7 @@ function! s:quote(pattern)
 endfunction
 
 " Convert a pattern into a zero-width pattern.
-function! s:zero_width(pattern)
+function s:zero_width(pattern)
   return '\ze\(' . a:pattern . '\)'
 endfunction
 
@@ -740,7 +740,7 @@ endfunction
 
 " Compute the heading prefix & suffix from the heading string, return as list.
 " Include a space after prefix if nonempty, and before suffix if nonempty.
-function! s:heading_split()
+function s:heading_split()
   " Compute index after `%s` in the heading string.
   let l:split_index = matchend(b:foldout_heading_string, '%s')
   if l:split_index < 0
@@ -760,18 +760,18 @@ function! s:heading_split()
 endfunction
 
 " Compute the appropriate cursor position for editing new heading.
-function! s:heading_pos(level)
+function s:heading_pos(level)
   return s:prefix_length() + a:level + 2
 endfunction
 
 " Compute the text for a heading of the given level.
-function! s:heading_text(level)
+function s:heading_text(level)
   let [l:prefix, l:suffix] = s:heading_split()
   return l:prefix . repeat(b:foldout_heading_symbol, a:level) . ' ' . l:suffix
 endfunction
 
 " Compute the length of the heading prefix.
-function! s:prefix_length()
+function s:prefix_length()
   return len(s:heading_split()[0])
 endfunction
 
@@ -783,7 +783,7 @@ endfunction
 " Include a space after prefix if nonempty, and before suffix if nonempty.
 " Takes a pattern to match the heading against.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_split(heading, ...)
+function s:pattern_split(heading, ...)
   let [l:prefix, l:suffix] = s:heading_split()
 
   let l:prefix_pattern
@@ -804,20 +804,20 @@ endfunction
 " The pattern expects a space character before the suffix if suffix nonempty.
 " Takes a pattern to match the heading against.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_exact(heading, level, ...)
+function s:pattern_exact(heading, level, ...)
   let [l:prefix, l:suffix] = s:pattern_split(a:heading, get(a:, 1, 0))
   return l:prefix . repeat(b:foldout_heading_symbol, a:level) . l:suffix
 endfunction
 
 " A pattern representing a top-level heading.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_top(...)
+function s:pattern_top(...)
   return s:pattern_exact('.*', 1, get(a:, 1, 0))
 endfunction
 
 " Compute a pattern representing a heading of at most the given level.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_max(level, ...)
+function s:pattern_max(level, ...)
   if a:level == 1
     return s:pattern_top(get(a:, 1, 0))
   endif
@@ -831,12 +831,12 @@ endfunction
 
 " A pattern representing a heading of any level.
 " With optional flag, include a `\ze` after the caret.
-function! s:pattern_any(...)
+function s:pattern_any(...)
   return s:pattern_max(b:foldout_max_level, get(a:, 1, 0))
 endfunction
 
 " A pattern representing the start of a heading of any level, up to the title.
-function! s:pattern_start()
+function s:pattern_start()
   return s:pattern_split('.*')[0]
     \ . b:foldout_heading_symbol
     \ . '\%[' . repeat(b:foldout_heading_symbol, b:foldout_max_level - 1) . ']'
@@ -844,7 +844,7 @@ function! s:pattern_start()
 endfunction
 
 " A pattern representing the end of a heading of any level, after the title.
-function! s:pattern_end()
+function s:pattern_end()
   let [l:prefix, l:suffix] = s:heading_split()
   let l:pattern = l:suffix == '' ? '$' : ' \zs' . s:escape(l:suffix[1:])
   return l:pattern
