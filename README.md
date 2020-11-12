@@ -15,11 +15,14 @@ recognize a heading.
 
 ## Installation
 
-Use your preferred installation method; for example, with
+Use your preferred installation method. It's recommended to also install
+[FastFold](https://github.com/Konfekt/FastFold/blob/master/plugin/fastfold.vim);
+this is optional but will make folding operations faster. For example, with
 [vim-plug](https://github.com/junegunn/vim-plug), use:
 
 ```
 Plug 'msuperdock/vim-foldout'
+Plug 'Konfekt/FastFold'
 ```
 
 If your `.vimrc` uses `mkview` or `loadview` to save and restore view data,
@@ -213,8 +216,8 @@ keywords wherever they appear.
 - `b:foldout_heading_comment` now defaults to `0` in Markdown files.
 - `b:foldout_heading_string` now defaults to `%s` in Markdown files.
 
-## Credits
+### [3.0]
 
-foldout relies critically on the [FastFold](https://github.com/Konfekt/FastFold)
-plugin, which is slightly modified and packaged with foldout.
+- We no longer bundle FastFold; users are recommended to install it separately.
+- Added `b:foldout_heading_ignore` option.
 

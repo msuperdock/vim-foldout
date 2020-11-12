@@ -1,6 +1,6 @@
 " vim-foldout - Outline-based folding with syntax highlighting.
 " Maintainer: Matt Superdock
-" Version: 2.0
+" Version: 3.0
 " License: MIT
 
 if exists('g:foldout_loaded')
@@ -68,16 +68,19 @@ endif
 
 " Enable foldout in files according to `g:foldout_files` setting.
 if g:foldout_files != ''
-  execute 'autocmd BufWinEnter ' . g:foldout_files . ' call foldout#enable()'
+  execute 'autocmd BufWinEnter ' . g:foldout_files
+    \ . ' call foldout#enable()'
 endif
 
 " Enable saving view data in files according to `g:foldout_files` setting.
 if g:foldout_files != '' && g:foldout_save
-  " The `loadview` must occur after foldout#enable(), or folds are lost.
+  " The `loadview` call must occur after foldout#enable(), or folds are lost.
   " We set `foldmethod` to `syntax`, since FastFold changes it to `manual`.
-  execute 'autocmd BufWinEnter ' . g:foldout_files . ' silent! loadview'
+  execute 'autocmd BufWinEnter ' . g:foldout_files
+    \ . ' silent! loadview'
   execute 'autocmd BufWinLeave ' . g:foldout_files 
     \ . " let &l:foldmethod = 'syntax'"
-  execute 'autocmd BufWinLeave ' . g:foldout_files . ' mkview'
+  execute 'autocmd BufWinLeave ' . g:foldout_files
+    \ . ' mkview'
 endif
 

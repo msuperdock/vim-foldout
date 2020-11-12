@@ -525,10 +525,10 @@ endfunction
 function foldout#toggle_fold()
   try
   if foldout#level() > 0
-    FastFoldUpdate
+    call s:update()
     execute "silent normal! jzak"
   else
-    FastFoldUpdate
+    call s:update()
     execute "silent normal! za"
   endif
   catch
@@ -550,7 +550,7 @@ function foldout#focus()
   normal! zv
 
   if foldout#level() > 0
-    FastFoldUpdate
+    call s:update()
     execute "silent normal! jzak"
   endif
 endfunction
@@ -848,5 +848,16 @@ function s:pattern_end()
   let [l:prefix, l:suffix] = s:heading_split()
   let l:pattern = l:suffix == '' ? '$' : ' \zs' . s:escape(l:suffix[1:])
   return l:pattern
+endfunction
+
+" ### Updating folds
+
+" Update folds in the current buffer.
+function s:update()
+  if exists('g:loaded_fastfold')
+    FastFoldUpdate
+  else
+    syntax sync fromstart 
+  endif
 endfunction
 
