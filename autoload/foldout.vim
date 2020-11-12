@@ -138,7 +138,7 @@ function foldout#enable()
         \ . (l:i >= b:foldout_min_fold ? 'fold ' : '')
         \ . 'contained keepend'
     endfor
-  augroup END
+  augroup end
 
   " Make sure syntax changes take effect.
   do Syntax
