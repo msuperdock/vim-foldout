@@ -207,8 +207,7 @@ endfunction
 " Determine the current heading level at the given line, or at the cursor if no
 " argument is given. Return 0 if not at a heading.
 function foldout#level(...)
-  let l:line = get(a:, 1, '.')
-  let l:match = matchend(getline(l:line), s:pattern_any(2))
+  let l:match = matchend(getline(get(a:, 1, '.')), s:pattern_any(1))
   return l:match >= 0 ? l:match - s:prefix_length() : 0
 endfunction
 
@@ -782,16 +781,14 @@ endfunction
 " The suffix pattern matches everything after the heading symbols.
 " Include a space after prefix if nonempty, and before suffix if nonempty.
 " Takes a pattern to match the heading against.
-" With optional flag, include a `\ze` after the caret.
-function s:pattern_split(heading, ...)
+function s:pattern_split(heading)
   let [l:prefix, l:suffix] = s:heading_split()
 
   let l:prefix_pattern
     \ = '^\s*'
     \ . s:escape(l:prefix)
   let l:suffix_pattern
-    \ = (get(a:, 1, 0) ? '\ze' : '')
-    \ . ' '
+    \ = ' '
     \ . a:heading
     \ . s:escape(l:suffix)
     \ . '.*$'
@@ -804,33 +801,27 @@ endfunction
 " The pattern expects a space character before the suffix if suffix nonempty.
 " Takes a pattern to match the heading against.
 " With optional flag, include a `\ze` after the caret.
-function s:pattern_exact(heading, level, ...)
-  let [l:prefix, l:suffix] = s:pattern_split(a:heading, get(a:, 1, 0))
+function s:pattern_exact(heading, level)
+  let [l:prefix, l:suffix] = s:pattern_split(a:heading)
   return l:prefix . repeat(b:foldout_heading_symbol, a:level) . l:suffix
 endfunction
 
-" A pattern representing a top-level heading.
-" With optional flag, include a `\ze` after the caret.
-function s:pattern_top(...)
-  return s:pattern_exact('.*', 1, get(a:, 1, 0))
-endfunction
-
 " Compute a pattern representing a heading of at most the given level.
-" With optional flag, include a `\ze` after the caret.
+" With optional flag, include a `\ze` after the heading symbols.
 function s:pattern_max(level, ...)
-  if a:level == 1
-    return s:pattern_top(get(a:, 1, 0))
-  endif
-
-  let [l:prefix, l:suffix] = s:pattern_split('.*', get(a:, 1, 0))
+  let [l:prefix, l:suffix] = s:pattern_split('.*')
+  let l:symbols = a:level > 1
+    \ ? '\%[' . repeat(b:foldout_heading_symbol, a:level - 1) . ']'
+    \ : ''
   return l:prefix
     \ . b:foldout_heading_symbol
-    \ . '\%[' . repeat(b:foldout_heading_symbol, a:level - 1) . ']'
+    \ . l:symbols
+    \ . (get(a:, 1, 0) ? '\ze' : '')
     \ . l:suffix
 endfunction
 
 " A pattern representing a heading of any level.
-" With optional flag, include a `\ze` after the caret.
+" With optional flag, include a `\ze` after the heading symbols.
 function s:pattern_any(...)
   return s:pattern_max(b:foldout_max_level, get(a:, 1, 0))
 endfunction
