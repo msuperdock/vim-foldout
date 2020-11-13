@@ -209,14 +209,14 @@ keywords wherever they appear.
 
 ## Changelog
 
-### [2.0] - 2020-07-22
+### [2.0] - Jul. 2020
 
 - Removed navigation mode. (If you relied on this, tell me by filing an issue.)
 - `g:foldout_files` now defaults to `*.*`, matching files with extensions.
 - `b:foldout_heading_comment` now defaults to `0` in Markdown files.
 - `b:foldout_heading_string` now defaults to `%s` in Markdown files.
 
-### [3.0]
+### [3.0] - Nov. 2020
 
 - We no longer bundle FastFold; users are recommended to install it separately.
 - Added `b:foldout_heading_ignore` option.
