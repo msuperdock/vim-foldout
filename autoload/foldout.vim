@@ -673,9 +673,10 @@ endfunction
 " https://stackoverflow.com/questions/9464844/how-to-get-group-name-of-highlighting-under-cursor-in-vim.
 function foldout#syntax()
   if exists("*synstack")
-    let l:g = synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
-    let l:s = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-    echo (l:g ==# '' ? '(none)' : join(l:s, ', ') . ' -> ' . l:g)
+    let l:group = synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
+    let l:stack = map(synstack(line('.'), col('.')),
+      \ {_, val -> synIDattr(val, "name")})
+    echo (l:group ==# '' ? '(none)' : join(l:stack, ', ') . ' -> ' . l:group)
   else
     echo '(none)'
   endif
