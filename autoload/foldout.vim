@@ -522,18 +522,12 @@ endfunction
 
 " Toggle current fold, moving down one line if at a header.
 function foldout#toggle_fold()
+  call s:update()
+
   try
-  if foldout#level() > 0
-    call s:update()
-    execute "silent normal! jzak"
-  else
-    call s:update()
-    execute "silent normal! za"
-  endif
+    execute 'silent normal! ' . (foldout#level() > 0 ? 'jzak' : 'za')
   catch
-    " Handle fold error more gracefully.
     echo 'No fold found.'
-    return
   endtry
 endfunction
 
@@ -672,7 +666,7 @@ endfunction
 " View the stack of syntax groups at the cursor. Modified from
 " https://stackoverflow.com/questions/9464844/how-to-get-group-name-of-highlighting-under-cursor-in-vim.
 function foldout#syntax()
-  if exists("*synstack")
+  if exists('*synstack')
     let l:group = synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
     let l:stack = map(synstack(line('.'), col('.')),
       \ {_, val -> synIDattr(val, "name")})
@@ -845,11 +839,13 @@ endfunction
 " ### Updating folds
 
 " Update folds in the current buffer.
-function s:update()
-  if exists('g:loaded_fastfold')
+if exists('g:loaded_fastfold')
+  function s:update()
     FastFoldUpdate
-  else
+  endfunction
+else
+  function s:update()
     syntax sync fromstart 
-  endif
-endfunction
+  endfunction
+endif
 
