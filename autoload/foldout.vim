@@ -839,13 +839,11 @@ endfunction
 " ### Updating folds
 
 " Update folds in the current buffer.
-if exists('g:loaded_fastfold')
-  function s:update()
+function s:update()
+  if exists('g:loaded_fastfold')
     FastFoldUpdate
-  endfunction
-else
-  function s:update()
-    syntax sync fromstart 
-  endfunction
-endif
+  else
+    execute 'syntax sync fromstart'
+  endif
+endfunction
 

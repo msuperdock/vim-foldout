@@ -84,3 +84,6 @@ if g:foldout_files != '' && g:foldout_save
     \ . ' mkview'
 endif
 
+" Ensure that fastfold is always activated.
+let g:fastfold_minlines = 0
+
