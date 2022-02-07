@@ -21,8 +21,8 @@ this is optional but will make folding operations faster. For example, with
 [vim-plug](https://github.com/junegunn/vim-plug), use:
 
 ```
-Plug 'msuperdock/vim-foldout'
 Plug 'Konfekt/FastFold'
+Plug 'msuperdock/vim-foldout'
 ```
 
 If your `.vimrc` uses `mkview` or `loadview` to save and restore view data,
