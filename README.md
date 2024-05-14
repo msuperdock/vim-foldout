@@ -1,7 +1,5 @@
 # vim-foldout
 
-![demo](https://github.com/msuperdock/vim-foldout/raw/master/demo.gif)
-
 foldout is an outline-based folding plugin for vim & neovim. Its unique feature
 is that folds are determined by Markdown-style headings within comments, and
 these headings are automatically highlighted. foldout also provides a suite of
