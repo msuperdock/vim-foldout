@@ -1,5 +1,10 @@
 " ## Enable
 
+" Determine whether foldout is enabled in the current buffer.
+function foldout#enabled()
+  return exists('b:foldout_enabled') && b:foldout_enabled
+endfunction
+
 " Enable foldout in the current buffer. If called while foldout is already
 " enabled, apply current values of the buffer option variables.
 function foldout#enable()
@@ -644,7 +649,9 @@ endfunction
 " Demote heading if at a heading, otherwise simulate tab.
 " Designed to be bound to `<tab>` in insert mode.
 function foldout#tab()
-  if foldout#level() > 0 && col('.') <= s:heading_pos(foldout#level())
+  if foldout#enabled()
+    \ && foldout#level() > 0
+    \ && col('.') <= s:heading_pos(foldout#level())
     call foldout#demote()
   else
     call feedkeys("\<tab>", 'n')
@@ -654,7 +661,9 @@ endfunction
 " Promote heading if at a heading, otherwise simulate shift-tab.
 " Designed to be bound to `<shift-tab>` in insert mode.
 function foldout#shift_tab()
-  if foldout#level() > 0 && col('.') <= s:heading_pos(foldout#level())
+  if foldout#enabled()
+    \ && foldout#level() > 0
+    \ && col('.') <= s:heading_pos(foldout#level())
     call foldout#promote()
   else
     call feedkeys("\<s-tab>", 'n')
